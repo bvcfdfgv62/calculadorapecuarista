@@ -13,7 +13,7 @@
     "preview": "vite preview",
     "electron:dev": "npm run build:electron && electron .",
     "electron:make": "npm run build:electron && electron-forge make",
-    "build:electron": "cross-env ELECTRON=true vite build"
+    "build:electron": "ELECTRON=true vite build"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.101.1",
