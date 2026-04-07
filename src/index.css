@@ -5,7 +5,7 @@
 :root {
   --background: #f4f6f5;
   --surface: #ffffff;
-  --surface-2: #f8faf9;
+  --surface-2: #f0fdf4;
   --foreground: #0f172a;
   --muted: #64748b;
   --border: #e2e8e4;
@@ -14,6 +14,14 @@
   --accent: #10b981;
   --sidebar-bg: #ffffff;
   --header-bg: #ffffff;
+
+  /* Typography Scale */
+  --font-base: 15px;
+  --leading-tight: 1.25;
+  --leading-normal: 1.6;
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0.01em;
+  --tracking-wide: 0.05em;
 }
 
 .dark {
@@ -35,22 +43,23 @@
 *::before,
 *::after {
   box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 html {
   scroll-behavior: smooth;
+  font-size: var(--font-base);
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  font-size: 16px;
-  line-height: 1.6;
+  line-height: var(--leading-normal);
+  letter-spacing: var(--tracking-normal);
   margin: 0;
   min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   transition: background-color 0.35s ease, color 0.35s ease;
 }
@@ -59,9 +68,10 @@ h1,
 h2,
 h3,
 h4,
-.font-heading,
-.font-number {
+.font-heading {
   font-family: 'Outfit', sans-serif;
+  letter-spacing: var(--tracking-tight);
+  font-weight: 800;
 }
 
 /* ── Utilities ─────────────────────────────────────── */

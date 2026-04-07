@@ -4,7 +4,7 @@ module.exports = {
         icon: './public/logo-corteva.ico',
         ignore: [
             /^\/src/,
-            /^\/public(?!\/logo-corteva\.ico)/,
+            /^\/public(?!\/logo-corteva\.(ico|png)|favicon\.svg|icons\.svg|manifest\.json)/,
             /^\/\.git/,
             /^\/tsconfig/,
             /^\/eslint/,

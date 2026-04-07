@@ -10,5 +10,16 @@ export default defineConfig({
     outDir: 'dist',
     emptyOutDir: true,
     minify: 'esbuild',
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('lucide-react') || id.includes('framer-motion')) return 'vendor-ui';
+            if (id.includes('recharts')) return 'vendor-charts';
+            return 'vendor';
+          }
+        }
+      }
+    }
   },
 })

@@ -1,6 +1,6 @@
 export interface CalculatorInputs {
     sampleArea: 1.0 | 0.25
-    sampleWeight: number
+    sampleWeight: number // Expecting grams now as it's more common
     dryMatterPercent: number
     forageSupplyPercent: number
     paddockCount: number
@@ -43,28 +43,34 @@ export const calculateResults = (inputs: CalculatorInputs): CalculatorOutputs =>
         bodyWeight,
         gpd,
         unavailabilityPercent,
-        pricePerArroba
+        pricePerArroba,
     } = inputs
 
     // 1. Forage Mass (kg MS/ha)
     const forageMass = sampleArea > 0 ? (sampleWeight * 10000 / sampleArea) * (dryMatterPercent / 100) : 0
 
-    // 2. Stocking Rate (Cab/ha)
+    // 2. Useful Mass (kg MS/ha) - just the mass now without efficiency factor
+    const usefulMass = forageMass
+
+    // 3. Daily Requirement (kg MS/head/day)
     const dailyRequirement = bodyWeight * (forageSupplyPercent / 100)
+
+    // 4. Stocking Rate (Cab/ha)
     const stockingRateHeads = (dailyRequirement > 0 && occupationDays > 0)
-        ? (forageMass / occupationDays) / dailyRequirement
+        ? (usefulMass / occupationDays) / dailyRequirement
         : 0
 
-    // 3. Stocking Rate (UA/ha)
+    // 5. Stocking Rate (UA/ha)
     const stockingRateUA = (stockingRateHeads * bodyWeight) / 450
 
-    // 4. Support Capacity (Total weight capacity in kg/ha)
+    // 6. Support Capacity (Total weight capacity in kg/ha)
     const supportCapacity = stockingRateHeads * bodyWeight
 
-    // 5. Productivity (@)
+    // 7. Productivity (@)
+    // 1 @ = 30kg gain (assuming 50% carcass yield means 1@ of carcass produced)
     const productivity = (stockingRateHeads * gpd * growthPeriod) / 30
 
-    // 6. Financials
+    // 8. Financials
     const revenue = productivity * pricePerArroba
     const reduction = revenue * (unavailabilityPercent / 100)
     const profit = revenue - reduction
