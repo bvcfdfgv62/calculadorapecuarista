@@ -30,10 +30,10 @@
     "recharts": "^3.8.1",
     "react-is": "^19.0.0",
     "tailwind-merge": "^3.5.0",
-    "tailwindcss": "^4.2.2",
-    "esbuild": "^0.25.0"
+    "tailwindcss": "^4.2.2"
   },
   "devDependencies": {
+    "esbuild": "^0.25.0",
     "electron-squirrel-startup": "^1.0.1",
     "@electron-forge/cli": "^7.11.1",
     "@electron-forge/maker-squirrel": "^7.11.1",
