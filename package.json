@@ -11,8 +11,9 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "electron:dev": "npm run build && electron .",
-    "electron:make": "npm run build && electron-forge make"
+    "electron:dev": "npm run build:electron && electron .",
+    "electron:make": "npm run build:electron && electron-forge make",
+    "build:electron": "cross-env ELECTRON=true vite build"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.101.1",
