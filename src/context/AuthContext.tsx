@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import type { User, Session } from '@supabase/supabase-js'
 
@@ -23,51 +23,55 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [session, setSession] = useState<Session | null>(null)
     const [profile, setProfile] = useState<UserProfile | null>(null)
     const [loading, setLoading] = useState(true)
+    // Prevent stale profile fetches from previous sessions overwriting current state
+    const fetchCounterRef = useRef(0)
 
-    const fetchProfile = async (uid: string, email?: string) => {
+    const fetchProfile = async (uid: string) => {
+        const fetchId = ++fetchCounterRef.current
         const { data } = await supabase
             .from('profiles')
-            .select('*')
+            .select('id, full_name, role, phone')
             .eq('id', uid)
             .single()
 
-        let profileData = data as UserProfile
-        if (email === 'valerio@gmail.com' || email === 'kaian@gmail.com') {
-            if (profileData) profileData.role = 'admin'
-            else profileData = { id: uid, full_name: 'Admin', role: 'admin', phone: null }
-        }
-        setProfile(profileData)
+        // Ignore result if a newer fetch has started (race condition guard)
+        if (fetchId !== fetchCounterRef.current) return
+
+        setProfile(data as UserProfile ?? null)
+        setLoading(false)
     }
 
     useEffect(() => {
+        let mounted = true
+
         supabase.auth.getSession().then(({ data: { session } }) => {
+            if (!mounted) return
             setSession(session)
             setUser(session?.user ?? null)
             if (session?.user) {
-                fetchProfile(session.user.id, session.user.email)
+                fetchProfile(session.user.id)
+            } else {
+                setLoading(false)
             }
-            if (!session) setLoading(false)
         })
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            if (!mounted) return
             setSession(session)
             setUser(session?.user ?? null)
             if (session?.user) {
-                fetchProfile(session.user.id, session.user.email)
+                fetchProfile(session.user.id)
             } else {
                 setProfile(null)
+                setLoading(false)
             }
-            setLoading(false)
         })
 
-        return () => subscription.unsubscribe()
+        return () => {
+            mounted = false
+            subscription.unsubscribe()
+        }
     }, [])
-
-    // Ensure loading is false only after profile is potentially fetched
-    useEffect(() => {
-        if (user && profile) setLoading(false)
-        if (!user) setLoading(false)
-    }, [user, profile])
 
     return (
         <AuthContext.Provider value={{ user, session, profile, loading }}>
@@ -77,3 +81,4 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 }
 
 export const useAuth = () => useContext(AuthContext)
+

@@ -13,11 +13,11 @@ export const AuthWrapper = ({ children, view }: AuthWrapperProps) => {
             {/* ========== BRANDING SIDE — Desktop Only ========== */}
             <div className="hidden lg:flex relative overflow-hidden bg-slate-900 items-center justify-center p-20">
                 <motion.img
-                    initial={{ scale: 1.2, opacity: 0 }}
-                    animate={{ scale: 1.05, opacity: 1 }}
-                    transition={{ duration: 15, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
+                    initial={{ scale: 1.1, opacity: 0 }}
+                    animate={{ scale: 1.0, opacity: 0.8 }}
+                    transition={{ duration: 2, ease: [0.22, 1, 0.36, 1] }}
                     src="./premium_livestock_bg_1775318109173.png"
-                    className="absolute inset-0 w-full h-full object-cover opacity-80"
+                    className="absolute inset-0 w-full h-full object-cover"
                 />
 
                 {/* Modern Gradient Overlays */}

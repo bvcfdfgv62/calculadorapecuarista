@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { supabase } from '../lib/supabase'
 import {
     History as HistoryIcon,
@@ -235,93 +236,133 @@ export const CalculationHistory = () => {
                 </div>
             </div>
 
-            {/* ─── MODAL DE CONFIRMAÇÃO ───────────────────────────────────── */}
-            <AnimatePresence>
-                {pendingDeleteId && (
-                    <motion.div
-                        key="delete-backdrop"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-6"
-                        style={{ backdropFilter: 'blur(8px)', backgroundColor: 'rgba(15,23,42,0.65)' }}
-                        onClick={cancelDelete}
-                    >
+            {/* ─── MODAL DE CONFIRMAÇÃO (Portal no document.body) ──────── */}
+            {createPortal(
+                <AnimatePresence>
+                    {pendingDeleteId && (
                         <motion.div
-                            key="delete-modal"
-                            initial={{ opacity: 0, y: 80, scale: 0.95 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 40, scale: 0.96 }}
-                            transition={{ type: 'spring', stiffness: 360, damping: 32 }}
-                            onClick={(e) => e.stopPropagation()}
-                            className="bg-white w-full sm:max-w-md rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-[0_32px_80px_rgba(0,0,0,0.35)] overflow-hidden"
+                            key="delete-backdrop"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.25 }}
+                            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-6"
+                            style={{ backdropFilter: 'blur(12px) saturate(0.8)', backgroundColor: 'rgba(2,6,23,0.75)' }}
+                            onClick={cancelDelete}
                         >
-                            {/* Top red stripe */}
-                            <div className="h-1.5 w-full bg-gradient-to-r from-red-400 via-red-500 to-rose-500" />
+                            <motion.div
+                                key="delete-modal"
+                                initial={{ opacity: 0, y: 60, scale: 0.92 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 30, scale: 0.95 }}
+                                transition={{ type: 'spring', stiffness: 440, damping: 36, mass: 0.8 }}
+                                onClick={(e) => e.stopPropagation()}
+                                className="w-full sm:max-w-[420px] overflow-hidden rounded-t-[2.5rem] sm:rounded-[2rem]"
+                                style={{
+                                    background: 'linear-gradient(145deg, #0f172a 0%, #1e1b4b 100%)',
+                                    boxShadow: '0 40px 100px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06) inset'
+                                }}
+                            >
+                                {/* Scan-line top gradient */}
+                                <div className="h-[2px] w-full" style={{ background: 'linear-gradient(90deg, transparent, #ef4444 30%, #f43f5e 60%, transparent)' }} />
 
-                            <div className="p-8 sm:p-10">
-                                {/* Icon */}
-                                <div className="flex justify-center mb-6">
-                                    <div className="relative">
-                                        <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-red-50 to-rose-100 flex items-center justify-center shadow-inner">
-                                            <Trash2 className="w-9 h-9 text-red-500" strokeWidth={1.75} />
-                                        </div>
-                                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full border-2 border-white flex items-center justify-center">
-                                            <span className="text-white text-[9px] font-black">!</span>
+                                {/* Fine grid texture */}
+                                <div className="absolute inset-0 opacity-[0.04]" style={{
+                                    backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 24px, rgba(255,255,255,0.5) 24px, rgba(255,255,255,0.5) 25px), repeating-linear-gradient(90deg, transparent, transparent 24px, rgba(255,255,255,0.5) 24px, rgba(255,255,255,0.5) 25px)',
+                                    pointerEvents: 'none'
+                                }} />
+
+                                <div className="relative p-8 sm:p-10">
+                                    {/* Danger Icon */}
+                                    <div className="flex justify-center mb-8">
+                                        <div className="relative">
+                                            {/* Pulse rings */}
+                                            <motion.div
+                                                animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0, 0.3] }}
+                                                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                                                className="absolute inset-0 bg-red-500 rounded-full"
+                                            />
+                                            <motion.div
+                                                animate={{ scale: [1, 1.8, 1], opacity: [0.15, 0, 0.15] }}
+                                                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
+                                                className="absolute inset-0 bg-red-500 rounded-full"
+                                            />
+                                            {/* Core icon */}
+                                            <div className="relative w-20 h-20 rounded-full flex items-center justify-center"
+                                                style={{ background: 'linear-gradient(135deg, #7f1d1d, #991b1b)', boxShadow: '0 0 0 1px rgba(239,68,68,0.25) inset, 0 8px 32px rgba(239,68,68,0.35)' }}>
+                                                <Trash2 className="w-8 h-8 text-red-300" strokeWidth={1.75} />
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                {/* Text */}
-                                <div className="text-center mb-8 space-y-3">
-                                    <h3 className="text-2xl font-black text-slate-900 tracking-tight leading-tight">
-                                        Excluir permanentemente?
-                                    </h3>
-                                    <p className="text-slate-400 text-sm leading-relaxed max-w-xs mx-auto">
-                                        O registro{' '}
-                                        <span className="font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-lg inline-block mt-1">
-                                            &ldquo;{pendingName}&rdquo;
-                                        </span>
-                                        {' '}será removido do banco de dados.
+                                    {/* Text */}
+                                    <div className="text-center mb-8 space-y-3">
+                                        <h3 className="text-2xl font-black tracking-tight leading-tight" style={{ color: '#f1f5f9' }}>
+                                            Excluir permanentemente?
+                                        </h3>
+                                        <p className="text-sm leading-relaxed font-medium" style={{ color: '#94a3b8' }}>
+                                            O registro{' '}
+                                            <span className="font-bold px-2 py-0.5 rounded-lg inline-block"
+                                                style={{ color: '#e2e8f0', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                                &ldquo;{pendingName}&rdquo;
+                                            </span>
+                                            {' '}será removido do banco de dados.
+                                        </p>
+
+                                        {/* Warning pill — glassmorphic */}
+                                        <div className="inline-flex items-center gap-2 text-xs font-bold px-4 py-2.5 rounded-xl mt-1"
+                                            style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.25)', color: '#fca5a5' }}>
+                                            <motion.div
+                                                animate={{ opacity: [1, 0.3, 1] }}
+                                                transition={{ duration: 1.2, repeat: Infinity }}
+                                                className="w-1.5 h-1.5 bg-red-400 rounded-full"
+                                            />
+                                            Esta ação não pode ser desfeita
+                                        </div>
+                                    </div>
+
+                                    {/* Divider */}
+                                    <div className="h-px w-full mb-6" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent)' }} />
+
+                                    {/* Buttons */}
+                                    <div className="flex flex-col sm:flex-row gap-3">
+                                        <button
+                                            onClick={cancelDelete}
+                                            className="flex-1 py-4 rounded-2xl font-bold text-sm active:scale-95 transition-all"
+                                            style={{ background: 'rgba(255,255,255,0.07)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.09)' }}
+                                            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.11)')}
+                                            onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.07)')}
+                                        >
+                                            Cancelar
+                                        </button>
+                                        <button
+                                            onClick={confirmDelete}
+                                            disabled={deleting}
+                                            className="flex-1 py-4 rounded-2xl font-black text-sm active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2.5"
+                                            style={{
+                                                background: 'linear-gradient(135deg, #dc2626, #e11d48)',
+                                                color: 'white',
+                                                boxShadow: '0 4px 24px rgba(220,38,38,0.4), 0 0 0 1px rgba(255,255,255,0.1) inset'
+                                            }}
+                                        >
+                                            {deleting
+                                                ? <><Loader2 size={16} className="animate-spin" /> Excluindo...</>
+                                                : <><Trash2 size={16} /> Sim, excluir</>
+                                            }
+                                        </button>
+                                    </div>
+
+                                    {/* ESC hint */}
+                                    <p className="text-center text-[10px] font-medium mt-5" style={{ color: '#475569' }}>
+                                        Clique fora ou em Cancelar para fechar
                                     </p>
-
-                                    {/* Warning pill */}
-                                    <div className="inline-flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 text-xs font-bold px-4 py-2.5 rounded-2xl mt-1">
-                                        <div className="w-1.5 h-1.5 bg-red-500 rounded-full" />
-                                        Esta ação não pode ser desfeita
-                                    </div>
                                 </div>
-
-                                {/* Buttons */}
-                                <div className="flex flex-col sm:flex-row gap-3">
-                                    <button
-                                        onClick={cancelDelete}
-                                        className="flex-1 py-4 bg-slate-100 text-slate-700 rounded-2xl font-bold text-sm hover:bg-slate-200 transition-all active:scale-95"
-                                    >
-                                        Cancelar
-                                    </button>
-                                    <button
-                                        onClick={confirmDelete}
-                                        disabled={deleting}
-                                        className="flex-1 py-4 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-2xl font-bold text-sm hover:from-red-600 hover:to-rose-600 transition-all active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2.5 shadow-lg shadow-red-500/25"
-                                    >
-                                        {deleting
-                                            ? <><Loader2 size={16} className="animate-spin" /> Excluindo...</>
-                                            : <><Trash2 size={16} /> Sim, excluir</>
-                                        }
-                                    </button>
-                                </div>
-
-                                {/* Cancel hint */}
-                                <p className="text-center text-[11px] text-slate-300 mt-4 font-medium">
-                                    Pressione fora do card ou Cancelar para voltar
-                                </p>
-                            </div>
+                            </motion.div>
                         </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                    )}
+                </AnimatePresence>,
+                document.body
+            )}
         </>
     )
 }

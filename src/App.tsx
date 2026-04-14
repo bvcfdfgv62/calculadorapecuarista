@@ -1,12 +1,13 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
 import { useAuth } from './context/AuthContext'
 import { AuthWrapper } from './components/AuthWrapper'
+import { SplashScreen } from './components/SplashScreen'
 import {
   LogOut, Calculator as CalcIcon, History, User as UserIcon,
   ChevronLeft, ChevronRight, ShieldCheck, Moon, Sun
 } from 'lucide-react'
 import { supabase } from './lib/supabase'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, MotionConfig } from 'framer-motion'
 
 // Lighter initial bundle with lazy loading
 const Login = lazy(() => import('./components/Login').then(m => ({ default: m.Login })))
@@ -21,7 +22,7 @@ const PageLoader = () => (
   </div>
 )
 
-function App() {
+function AppContent() {
   const { user, profile, loading } = useAuth()
   const [authView, setAuthView] = useState<'login' | 'register'>('login')
   const [activeTab, setActiveTab] = useState<'calculator' | 'history' | 'admin'>('calculator')
@@ -70,9 +71,9 @@ function App() {
       <motion.aside
         initial={false}
         animate={{ width: isSidebarCollapsed ? 88 : 280 }}
-        transition={{ type: 'spring', stiffness: 320, damping: 32 }}
+        transition={{ type: 'spring', stiffness: 600, damping: 40, mass: 0.5 }}
         className="hidden md:flex flex-col z-10 shadow-xl relative overflow-hidden border-r"
-        style={{ background: 'var(--sidebar-bg)', borderColor: 'var(--border)' }}
+        style={{ background: 'var(--sidebar-bg)', borderColor: 'var(--border)', willChange: 'width' }}
       >
         {/* Logo */}
         <div className={`p-6 flex items-center ${isSidebarCollapsed ? 'justify-center' : 'justify-between'}`}>
@@ -208,10 +209,10 @@ function App() {
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
-              initial={{ opacity: 0, y: 12, filter: 'blur(4px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: -12, filter: 'blur(4px)' }}
-              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
               className="page-content"
             >
               <Suspense fallback={<PageLoader />}>
@@ -281,4 +282,33 @@ function MobileTabItem({ icon, label, active, onClick, danger = false }: {
   )
 }
 
-export default App
+export default function App() {
+  const [showSplash, setShowSplash] = useState(true)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowSplash(false), 3500)
+    return () => clearTimeout(timer)
+  }, [])
+
+  return (
+    /* Global spring defaults — all motion components inherit this */
+    <MotionConfig
+      transition={{
+        type: 'spring',
+        stiffness: 500,
+        damping: 38,
+        mass: 0.6,
+      }}
+    >
+      <div className="relative h-screen w-screen overflow-hidden">
+        {/* App always rendered underneath splash */}
+        <div className="absolute inset-0">
+          <AppContent />
+        </div>
+        <AnimatePresence>
+          {showSplash && <SplashScreen key="splash" />}
+        </AnimatePresence>
+      </div>
+    </MotionConfig>
+  )
+}
