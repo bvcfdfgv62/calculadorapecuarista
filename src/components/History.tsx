@@ -62,96 +62,94 @@ function CompareRow({ label, a, b, unit = '', higherIsBetter = true }: {
 }
 
 function ComparisonModal({ a, b, onClose }: { a: any; b: any; onClose: () => void }) {
-    const nameA = a.inputs?.propertyData?.farmName || a.metadata?.ranch_name || 'Simulação A'
-    const nameB = b.inputs?.propertyData?.farmName || b.metadata?.ranch_name || 'Simulação B'
+    const nameA = a?.inputs?.propertyData?.farmName || a?.metadata?.ranch_name || 'Simulação A'
+    const nameB = b?.inputs?.propertyData?.farmName || b?.metadata?.ranch_name || 'Simulação B'
 
-    return createPortal(
-        <AnimatePresence>
+    // Rendered via portal in parent — this just returns plain JSX
+    return (
+        <motion.div
+            key="cmp-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-6 overflow-y-auto"
+            style={{ backdropFilter: 'blur(14px) saturate(0.8)', backgroundColor: 'rgba(2,6,23,0.82)' }}
+            onClick={onClose}
+        >
             <motion.div
-                key="cmp-backdrop"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-6 overflow-y-auto"
-                style={{ backdropFilter: 'blur(14px) saturate(0.8)', backgroundColor: 'rgba(2,6,23,0.82)' }}
-                onClick={onClose}
+                key="cmp-modal"
+                initial={{ opacity: 0, y: 60, scale: 0.93 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 30, scale: 0.96 }}
+                transition={{ type: 'spring', stiffness: 440, damping: 36, mass: 0.8 }}
+                onClick={(e) => e.stopPropagation()}
+                className="w-full sm:max-w-2xl overflow-hidden rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl"
+                style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
             >
-                <motion.div
-                    key="cmp-modal"
-                    initial={{ opacity: 0, y: 60, scale: 0.93 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 30, scale: 0.96 }}
-                    transition={{ type: 'spring', stiffness: 440, damping: 36, mass: 0.8 }}
-                    onClick={(e) => e.stopPropagation()}
-                    className="w-full sm:max-w-2xl overflow-hidden rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl"
-                    style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
-                >
-                    {/* Header bar */}
-                    <div className="p-6 border-b flex items-center justify-between gap-4"
-                        style={{ borderColor: 'var(--border)', background: 'var(--surface-2)' }}>
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 rounded-xl bg-emerald-600/15 text-emerald-600">
-                                <GitCompare size={18} />
-                            </div>
-                            <h3 className="text-base font-black uppercase tracking-tight" style={{ color: 'var(--foreground)' }}>
-                                Comparativo de Simulações
-                            </h3>
+                {/* Header bar */}
+                <div className="p-6 border-b flex items-center justify-between gap-4"
+                    style={{ borderColor: 'var(--border)', background: 'var(--surface-2)' }}>
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-xl bg-emerald-600/15 text-emerald-600">
+                            <GitCompare size={18} />
                         </div>
-                        <button onClick={onClose}
-                            className="p-2 rounded-xl transition-colors hover:bg-rose-500/10 hover:text-rose-500"
-                            style={{ color: 'var(--muted)' }}>
-                            <X size={18} />
-                        </button>
+                        <h3 className="text-base font-black uppercase tracking-tight" style={{ color: 'var(--foreground)' }}>
+                            Comparativo de Simulações
+                        </h3>
                     </div>
+                    <button onClick={onClose}
+                        className="p-2 rounded-xl transition-colors hover:bg-rose-500/10 hover:text-rose-500"
+                        style={{ color: 'var(--muted)' }}>
+                        <X size={18} />
+                    </button>
+                </div>
 
-                    {/* Farm name labels */}
-                    <div className="grid grid-cols-[1fr_auto_1fr] gap-3 px-6 pt-5 pb-3">
-                        <div className="text-right">
-                            <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Base</span>
-                            <p className="text-sm font-black uppercase truncate mt-0.5" style={{ color: 'var(--foreground)' }}>{nameA}</p>
-                            <p className="text-[10px]" style={{ color: 'var(--muted)' }}>{new Date(a.created_at).toLocaleDateString('pt-BR')}</p>
-                        </div>
-                        <div className="flex items-center justify-center">
-                            <div className="p-2 rounded-full border" style={{ borderColor: 'var(--border)', background: 'var(--surface-2)' }}>
-                                <ArrowRight size={14} className="text-emerald-600" />
-                            </div>
-                        </div>
-                        <div>
-                            <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Comparado</span>
-                            <p className="text-sm font-black uppercase truncate mt-0.5" style={{ color: 'var(--foreground)' }}>{nameB}</p>
-                            <p className="text-[10px]" style={{ color: 'var(--muted)' }}>{new Date(b.created_at).toLocaleDateString('pt-BR')}</p>
+                {/* Farm name labels */}
+                <div className="grid grid-cols-[1fr_auto_1fr] gap-3 px-6 pt-5 pb-3">
+                    <div className="text-right">
+                        <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Base</span>
+                        <p className="text-sm font-black uppercase truncate mt-0.5" style={{ color: 'var(--foreground)' }}>{nameA}</p>
+                        <p className="text-[10px]" style={{ color: 'var(--muted)' }}>{new Date(a.created_at).toLocaleDateString('pt-BR')}</p>
+                    </div>
+                    <div className="flex items-center justify-center">
+                        <div className="p-2 rounded-full border" style={{ borderColor: 'var(--border)', background: 'var(--surface-2)' }}>
+                            <ArrowRight size={14} className="text-emerald-600" />
                         </div>
                     </div>
-
-                    {/* Metrics */}
-                    <div className="px-6 pb-6 space-y-4">
-                        {/* Section: Pastagem */}
-                        <div className="rounded-2xl border p-5 space-y-1" style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}>
-                            <p className="text-[9px] font-black uppercase tracking-[0.25em] mb-3" style={{ color: 'var(--muted)' }}>Pastagem</p>
-                            <CompareRow label="Massa Forragem" a={a.outputs.forageMass} b={b.outputs.forageMass} unit="kg MS/ha" />
-                            <CompareRow label="MS Disponível" a={a.outputs.availableDryMatter} b={b.outputs.availableDryMatter} unit="kg MS/ha" />
-                            <CompareRow label="Lotação (UA/ha)" a={a.outputs.stockingRateUA} b={b.outputs.stockingRateUA} unit="UA" />
-                        </div>
-
-                        {/* Section: Produção */}
-                        <div className="rounded-2xl border p-5 space-y-1" style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}>
-                            <p className="text-[9px] font-black uppercase tracking-[0.25em] mb-3" style={{ color: 'var(--muted)' }}>Produção de Carne</p>
-                            <CompareRow label="Produtividade" a={a.outputs.productivity} b={b.outputs.productivity} unit="@/ha" />
-                            <CompareRow label="GPD projetado" a={a.inputs.gpd} b={b.inputs.gpd} unit="kg/dia" />
-                        </div>
-
-                        {/* Section: Financeiro */}
-                        <div className="rounded-2xl border p-5 space-y-1" style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}>
-                            <p className="text-[9px] font-black uppercase tracking-[0.25em] mb-3" style={{ color: 'var(--muted)' }}>Financeiro</p>
-                            <CompareRow label="Receita Bruta" a={a.outputs.revenue} b={b.outputs.revenue} unit="R$" />
-                            <CompareRow label="Reduções" a={a.outputs.reduction} b={b.outputs.reduction} unit="R$" higherIsBetter={false} />
-                            <CompareRow label="Lucro Líquido" a={a.outputs.profit} b={b.outputs.profit} unit="R$" />
-                        </div>
+                    <div>
+                        <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Comparado</span>
+                        <p className="text-sm font-black uppercase truncate mt-0.5" style={{ color: 'var(--foreground)' }}>{nameB}</p>
+                        <p className="text-[10px]" style={{ color: 'var(--muted)' }}>{new Date(b.created_at).toLocaleDateString('pt-BR')}</p>
                     </div>
-                </motion.div>
+                </div>
+
+                {/* Metrics */}
+                <div className="px-6 pb-6 space-y-4">
+                    {/* Section: Pastagem */}
+                    <div className="rounded-2xl border p-5 space-y-1" style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}>
+                        <p className="text-[9px] font-black uppercase tracking-[0.25em] mb-3" style={{ color: 'var(--muted)' }}>Pastagem</p>
+                        <CompareRow label="Massa Forragem" a={a.outputs.forageMass} b={b.outputs.forageMass} unit="kg MS/ha" />
+                        <CompareRow label="MS Disponível" a={a.outputs.availableDryMatter} b={b.outputs.availableDryMatter} unit="kg MS/ha" />
+                        <CompareRow label="Lotação (UA/ha)" a={a.outputs.stockingRateUA} b={b.outputs.stockingRateUA} unit="UA" />
+                    </div>
+
+                    {/* Section: Produção */}
+                    <div className="rounded-2xl border p-5 space-y-1" style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}>
+                        <p className="text-[9px] font-black uppercase tracking-[0.25em] mb-3" style={{ color: 'var(--muted)' }}>Produção de Carne</p>
+                        <CompareRow label="Produtividade" a={a.outputs.productivity} b={b.outputs.productivity} unit="@/ha" />
+                        <CompareRow label="GPD projetado" a={a.inputs.gpd} b={b.inputs.gpd} unit="kg/dia" />
+                    </div>
+
+                    {/* Section: Financeiro */}
+                    <div className="rounded-2xl border p-5 space-y-1" style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}>
+                        <p className="text-[9px] font-black uppercase tracking-[0.25em] mb-3" style={{ color: 'var(--muted)' }}>Financeiro</p>
+                        <CompareRow label="Receita Bruta" a={a.outputs.revenue} b={b.outputs.revenue} unit="R$" />
+                        <CompareRow label="Reduções" a={a.outputs.reduction} b={b.outputs.reduction} unit="R$" higherIsBetter={false} />
+                        <CompareRow label="Lucro Líquido" a={a.outputs.profit} b={b.outputs.profit} unit="R$" />
+                    </div>
+                </div>
             </motion.div>
-        </AnimatePresence>,
-        document.body
+        </motion.div>
     )
 }
 
@@ -294,9 +292,19 @@ export const CalculationHistory = () => {
                 {toast && <Toast message={toast.m} type={toast.t} onClose={() => setToast(null)} />}
             </AnimatePresence>
 
-            {/* Comparison modal */}
-            {showCompare && compareRecords.length === 2 && (
-                <ComparisonModal a={compareRecords[0]} b={compareRecords[1]} onClose={() => setShowCompare(false)} />
+            {/* Comparison modal — portal controlled from parent to avoid AnimatePresence/portal conflicts */}
+            {createPortal(
+                <AnimatePresence>
+                    {showCompare && compareRecords.length === 2 && (
+                        <ComparisonModal
+                            key="comparison-modal"
+                            a={compareRecords[0]}
+                            b={compareRecords[1]}
+                            onClose={() => setShowCompare(false)}
+                        />
+                    )}
+                </AnimatePresence>,
+                document.body
             )}
 
             <div className="space-y-5">
