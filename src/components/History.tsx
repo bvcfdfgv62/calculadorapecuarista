@@ -55,7 +55,7 @@ export const CalculationHistory = () => {
         return (
             <div className="h-64 flex flex-col items-center justify-center gap-4 text-emerald-600 opacity-50">
                 <Loader2 className="w-8 h-8 animate-spin" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Sincronizando Histórico...</span>
+                <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Sincronizando Histórico...</span>
             </div>
         )
     }
@@ -63,12 +63,12 @@ export const CalculationHistory = () => {
     // ─── Empty ────────────────────────────────────────────────────────────────
     if (history.length === 0) {
         return (
-            <div className="bg-white border border-slate-100 rounded-3xl flex flex-col items-center justify-center p-16 text-center mt-6 shadow-sm">
-                <div className="p-5 bg-emerald-50 rounded-2xl mb-6">
-                    <Database className="w-10 h-10 text-emerald-600/30" />
+            <div className="rounded-3xl flex flex-col items-center justify-center p-16 text-center mt-6 shadow-sm border" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+                <div className="p-5 bg-emerald-500/10 rounded-2xl mb-6">
+                    <Database className="w-10 h-10 text-emerald-600/40" />
                 </div>
-                <h3 className="font-black text-xl mb-2 text-slate-800 uppercase tracking-tight">Vazio por enquanto</h3>
-                <p className="text-slate-400 text-sm max-w-xs font-medium">Os cálculos que você salvar aparecerão aqui de forma organizada e segura.</p>
+                <h3 className="font-black text-xl mb-2 uppercase tracking-tight" style={{ color: 'var(--foreground)' }}>Vazio por enquanto</h3>
+                <p className="text-sm max-w-xs font-medium" style={{ color: 'var(--muted)' }}>Os cálculos que você salvar aparecerão aqui de forma organizada e segura.</p>
             </div>
         )
     }
@@ -87,8 +87,8 @@ export const CalculationHistory = () => {
                             <HistoryIcon className="w-6 h-6 text-white" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight">Histórico de Cálculos</h2>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Base de dados na nuvem</p>
+                            <h2 className="text-xl font-black uppercase tracking-tight" style={{ color: 'var(--foreground)' }}>Histórico de Cálculos</h2>
+                            <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Base de dados na nuvem</p>
                         </div>
                     </div>
                     <button
@@ -108,37 +108,39 @@ export const CalculationHistory = () => {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.98, transition: { duration: 0.2 } }}
-                                className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all group"
+                                className="rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all group border"
+                                style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
                             >
                                 {/* Row header */}
                                 <div
                                     onClick={() => setExpandedId(expandedId === record.id ? null : record.id)}
-                                    className={`p-5 px-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer transition-colors ${expandedId === record.id ? 'bg-slate-50' : 'hover:bg-emerald-50/30'}`}
+                                    className={`p-5 px-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer transition-colors ${expandedId === record.id ? 'bg-emerald-500/5' : 'hover:bg-emerald-500/5'}`}
                                 >
                                     <div className="flex items-center gap-5">
-                                        <div className={`p-3 rounded-2xl transition-all shadow-sm ${expandedId === record.id ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                                        <div className={`p-3 rounded-2xl transition-all shadow-sm ${expandedId === record.id ? 'bg-emerald-600 text-white' : ''}`}
+                                            style={expandedId !== record.id ? { background: 'var(--surface-2)', color: 'var(--muted)' } : {}}>
                                             <Calendar size={20} />
                                         </div>
                                         <div>
                                             <div className="flex items-center gap-3">
-                                                <span className="font-black text-slate-800 uppercase text-sm tracking-tight">
-                                                    {record.metadata?.ranch_name || 'Cálculo Sem Nome'}
+                                                <span className="font-black uppercase text-sm tracking-tight" style={{ color: 'var(--foreground)' }}>
+                                                    {record.inputs?.propertyData?.farmName || record.metadata?.ranch_name || 'Cálculo Sem Nome'}
                                                 </span>
-                                                <div className="w-1 h-1 bg-slate-300 rounded-full" />
-                                                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">
+                                                <div className="w-1 h-1 rounded-full" style={{ background: 'var(--border)' }} />
+                                                <span className="text-[10px] font-extrabold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>
                                                     {new Date(record.created_at).toLocaleDateString('pt-BR')}
                                                 </span>
                                             </div>
-                                            <p className="text-xs font-medium text-slate-500 mt-1">
-                                                Lucro Final: <span className="font-black text-emerald-600 italic">R$ {record.outputs.profit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                                            <p className="text-xs font-medium mt-1" style={{ color: 'var(--muted)' }}>
+                                                Lucro Final: <span className="font-black text-emerald-600 dark:text-emerald-400 italic">R$ {record.outputs.profit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                                             </p>
                                         </div>
                                     </div>
 
                                     <div className="flex items-center gap-6 self-end sm:self-auto">
                                         <div className="flex-col items-end mr-4 hidden md:flex">
-                                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.1em]">Produtividade</span>
-                                            <span className="text-sm font-black text-slate-700">{record.outputs.productivity} @/ha</span>
+                                            <span className="text-[9px] font-black uppercase tracking-[0.1em]" style={{ color: 'var(--muted)' }}>Produtividade</span>
+                                            <span className="text-sm font-black" style={{ color: 'var(--foreground)' }}>{record.outputs.productivity} @/ha</span>
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <button
@@ -172,11 +174,12 @@ export const CalculationHistory = () => {
                                             initial={{ height: 0, opacity: 0 }}
                                             animate={{ height: 'auto', opacity: 1 }}
                                             exit={{ height: 0, opacity: 0 }}
-                                            className="border-t border-slate-100 bg-white"
+                                            className="border-t"
+                                            style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
                                         >
                                             <div className="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                                                 <div className="space-y-4">
-                                                    <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] mb-4">Parâmetros do Campo</h4>
+                                                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--muted)' }}>Parâmetros do Campo</h4>
                                                     <HistoryField label="Amostra" value={`${record.inputs.sampleWeight} kg`} />
                                                     <HistoryField label="Matéria Seca" value={`${record.inputs.dryMatterPercent}%`} />
                                                     <HistoryField label="Lotação Meta" value={`${record.outputs.stockingRateUA} UA`} />
@@ -184,23 +187,23 @@ export const CalculationHistory = () => {
                                                 </div>
 
                                                 <div className="space-y-4">
-                                                    <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] mb-4">Localização</h4>
+                                                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--muted)' }}>Localização</h4>
                                                     {record.inputs.propertyData?.farmName ? (
                                                         <div className="space-y-4">
                                                             <HistoryField label="Proprietário" value={record.inputs.propertyData.owner} />
-                                                            <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100 mt-2">
-                                                                <div className="p-2 bg-white rounded-lg shadow-sm">
+                                                            <div className="flex items-center gap-3 p-4 rounded-2xl border mt-2" style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}>
+                                                                <div className="p-2 rounded-lg" style={{ background: 'var(--surface)' }}>
                                                                     <MapPin size={16} className="text-emerald-600" />
                                                                 </div>
                                                                 <div>
-                                                                    <p className="text-[10px] font-black uppercase text-slate-400">Cidade/UF</p>
-                                                                    <p className="text-xs font-bold text-slate-800">{record.inputs.propertyData.city} / {record.inputs.propertyData.state}</p>
+                                                                    <p className="text-[10px] font-black uppercase" style={{ color: 'var(--muted)' }}>Cidade/UF</p>
+                                                                    <p className="text-xs font-bold" style={{ color: 'var(--foreground)' }}>{record.inputs.propertyData.city} / {record.inputs.propertyData.state}</p>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     ) : (
-                                                        <div className="p-6 bg-slate-50 rounded-2xl border border-dashed border-slate-200 flex flex-col items-center">
-                                                            <p className="text-xs text-slate-400 font-bold italic">Sem dados registrados</p>
+                                                        <div className="p-6 rounded-2xl border border-dashed flex flex-col items-center" style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}>
+                                                            <p className="text-xs font-bold italic" style={{ color: 'var(--muted)' }}>Sem dados registrados</p>
                                                         </div>
                                                     )}
                                                 </div>
@@ -369,9 +372,9 @@ export const CalculationHistory = () => {
 
 function HistoryField({ label, value }: { label: string, value: string | number }) {
     return (
-        <div className="flex justify-between items-center py-2.5 border-b border-slate-50 last:border-0">
-            <span className="text-[11px] font-black uppercase text-slate-400 tracking-wider font-mono">{label}</span>
-            <span className="text-sm font-black text-slate-700">{value}</span>
+        <div className="flex justify-between items-center py-2.5 border-b last:border-0" style={{ borderColor: 'var(--border)' }}>
+            <span className="text-[11px] font-black uppercase tracking-wider font-mono" style={{ color: 'var(--muted)' }}>{label}</span>
+            <span className="text-sm font-black" style={{ color: 'var(--foreground)' }}>{value}</span>
         </div>
     )
 }
