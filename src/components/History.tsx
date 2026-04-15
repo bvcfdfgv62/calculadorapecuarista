@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { supabase } from '../lib/supabase'
 import {
@@ -10,10 +10,12 @@ import {
     RefreshCw,
     ChevronDown,
     MapPin,
-    Download
+    Download,
+    Wifi
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { generateProfessionalPDF } from '../utils/pdfGenerator'
+import { Toast } from './calculator/SharedUI'
 
 export const CalculationHistory = () => {
     const [history, setHistory] = useState<any[]>([])
@@ -21,8 +23,10 @@ export const CalculationHistory = () => {
     const [expandedId, setExpandedId] = useState<string | null>(null)
     const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
     const [deleting, setDeleting] = useState(false)
+    const [toast, setToast] = useState<{ m: string; t: 'success' | 'error' } | null>(null)
+    const [isLive, setIsLive] = useState(false)
 
-    const fetchHistory = async () => {
+    const fetchHistory = useCallback(async () => {
         setLoading(true)
         const { data, error } = await supabase
             .from('calculations')
@@ -30,9 +34,36 @@ export const CalculationHistory = () => {
             .order('created_at', { ascending: false })
         if (!error && data) setHistory(data)
         setLoading(false)
-    }
+    }, [])
 
-    useEffect(() => { fetchHistory() }, [])
+    // ── Initial fetch + Realtime subscription ─────────────────────────────────
+    useEffect(() => {
+        fetchHistory()
+
+        // Subscribe to any change on the calculations table for this user
+        const channel = supabase
+            .channel('calculations-realtime')
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'calculations' },
+                (payload) => {
+                    if (payload.eventType === 'INSERT') {
+                        setHistory(prev => [payload.new as any, ...prev])
+                    } else if (payload.eventType === 'DELETE') {
+                        setHistory(prev => prev.filter(item => item.id !== (payload.old as any).id))
+                    } else if (payload.eventType === 'UPDATE') {
+                        setHistory(prev => prev.map(item =>
+                            item.id === (payload.new as any).id ? payload.new : item
+                        ))
+                    }
+                }
+            )
+            .subscribe((status) => {
+                setIsLive(status === 'SUBSCRIBED')
+            })
+
+        return () => { supabase.removeChannel(channel) }
+    }, [fetchHistory])
 
     const requestDelete = (e: React.MouseEvent, id: string) => {
         e.stopPropagation()
@@ -42,13 +73,36 @@ export const CalculationHistory = () => {
     const confirmDelete = async () => {
         if (!pendingDeleteId) return
         setDeleting(true)
-        const { error } = await supabase.from('calculations').delete().eq('id', pendingDeleteId)
-        if (!error) setHistory(prev => prev.filter(item => item.id !== pendingDeleteId))
-        setDeleting(false)
-        setPendingDeleteId(null)
+        try {
+            // BUG FIX: use .select() so Supabase returns the deleted row.
+            // Without .select(), RLS can silently block the delete and still
+            // return error=null — causing the local state to clear but the DB row to remain.
+            const { data, error } = await supabase
+                .from('calculations')
+                .delete()
+                .eq('id', pendingDeleteId)
+                .select('id')
+
+            if (error) throw error
+
+            if (!data || data.length === 0) {
+                // Delete was silently blocked (RLS or row not found)
+                throw new Error('Sem permissão para excluir este registro.')
+            }
+
+            // Confirmed deleted — remove from local state
+            setHistory(prev => prev.filter(item => item.id !== pendingDeleteId))
+            setToast({ m: 'Registro excluído com sucesso.', t: 'success' })
+        } catch (err: any) {
+            setToast({ m: err.message || 'Erro ao excluir. Tente novamente.', t: 'error' })
+        } finally {
+            setDeleting(false)
+            setPendingDeleteId(null)
+        }
     }
 
     const cancelDelete = () => setPendingDeleteId(null)
+
 
     // ─── Loading ──────────────────────────────────────────────────────────────
     if (loading) {
@@ -75,10 +129,17 @@ export const CalculationHistory = () => {
 
     // ─── List + Modal ─────────────────────────────────────────────────────────
     const pendingRecord = history.find(h => h.id === pendingDeleteId)
-    const pendingName = pendingRecord?.metadata?.ranch_name || 'este cálculo'
+    const pendingName = pendingRecord?.inputs?.propertyData?.farmName
+        || pendingRecord?.metadata?.ranch_name
+        || 'este cálculo'
 
     return (
         <>
+            {/* Toast feedback */}
+            <AnimatePresence>
+                {toast && <Toast message={toast.m} type={toast.t} onClose={() => setToast(null)} />}
+            </AnimatePresence>
+
             <div className="space-y-6">
                 {/* Header */}
                 <div className="flex items-center justify-between">
@@ -91,12 +152,22 @@ export const CalculationHistory = () => {
                             <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Base de dados na nuvem</p>
                         </div>
                     </div>
-                    <button
-                        onClick={fetchHistory}
-                        className="flex items-center gap-2 text-[10px] font-black uppercase text-emerald-600 hover:text-emerald-700 transition-colors bg-emerald-50 px-4 py-2 rounded-xl border border-emerald-100"
-                    >
-                        <RefreshCw size={12} /> Sincronizar agora
-                    </button>
+                    <div className="flex items-center gap-3">
+                        {/* Realtime live indicator */}
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border" style={{ borderColor: 'var(--border)', background: 'var(--surface-2)' }}>
+                            <Wifi size={11} className={isLive ? 'text-emerald-500' : 'text-slate-400'} />
+                            <span className={`text-[9px] font-black uppercase tracking-widest ${isLive ? 'text-emerald-500' : ''}`} style={!isLive ? { color: 'var(--muted)' } : {}}>
+                                {isLive ? 'Ao vivo' : 'Offline'}
+                            </span>
+                        </div>
+                        <button
+                            onClick={fetchHistory}
+                            className="flex items-center gap-2 text-[10px] font-black uppercase transition-colors px-4 py-2 rounded-xl border text-emerald-600 hover:text-emerald-700"
+                            style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}
+                        >
+                            <RefreshCw size={12} /> Sincronizar
+                        </button>
+                    </div>
                 </div>
 
                 {/* Records */}
