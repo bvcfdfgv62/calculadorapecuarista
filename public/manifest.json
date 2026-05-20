@@ -1,0 +1,23 @@
+{
+    "name": "Calculadora para Pecuaristas | Oficial",
+    "short_name": "Calculadora Pecuária",
+    "description": "Ferramenta de elite para gestão de pastagens e produtividade bovina.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#f8faf9",
+    "theme_color": "#0d8a43",
+    "icons": [
+        {
+            "src": "/logo-corteva.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/logo-corteva.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
