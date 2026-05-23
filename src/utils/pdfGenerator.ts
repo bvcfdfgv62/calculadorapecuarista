@@ -116,8 +116,7 @@ export const generateProfessionalPDF = async (
     // ─── 01. DADOS DA PROPRIEDADE ─────────────────────────────────────────────
     drawSectionHeader('01. Dados da Propriedade')
     
-    // Card de Dados da Propriedade (Ampliado para acomodar fontes maiores de acessibilidade)
-    const PROP_H = 26
+    const PROP_H = 22
     doc.setFillColor(COLOR_BG_LIGHT)
     doc.setDrawColor(COLOR_BORDER)
     doc.setLineWidth(0.15)
@@ -130,196 +129,208 @@ export const generateProfessionalPDF = async (
     const phone = inputs.propertyData?.phone || 'Não informado'
     const email = inputs.propertyData?.email || 'Não informado'
 
-    // Linha 1 do Card (Fontes ampliadas e em negrito forte)
-    doc.setFontSize(9)
+    // Linha de conteúdo do Card (Organizada em 3 colunas de dados)
+    doc.setFontSize(8)
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(COLOR_SECONDARY)
-    doc.text('PROPRIETÁRIO', 18.5, y + 6)
+    doc.text('PROPRIETÁRIO / FAZENDA', 18.5, y + 6)
     doc.text('LOCALIZAÇÃO', 108.5, y + 6)
+    doc.text('CONTATO / RESPONSÁVEL', 153.5, y + 6)
 
-    doc.setFontSize(11)
+    doc.setFontSize(9.5)
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(COLOR_PRIMARY)
-    doc.text(owner.substring(0, 50), 18.5, y + 10.5)
-    doc.text(loc.substring(0, 50), 108.5, y + 10.5)
+    doc.text(owner.substring(0, 45), 18.5, y + 11)
+    doc.text(loc.substring(0, 30), 108.5, y + 11)
+    doc.text(phone.substring(0, 20), 153.5, y + 11)
 
-    // Linha 2 do Card
-    doc.setFontSize(9)
-    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(8)
+    doc.setFont('helvetica', 'normal')
     doc.setTextColor(COLOR_SECONDARY)
-    doc.text('CONTATO', 18.5, y + 16.5)
-    doc.text('E-MAIL DE CONTATO', 108.5, y + 16.5)
-
-    doc.setFontSize(11)
-    doc.setFont('helvetica', 'bold')
-    doc.setTextColor(COLOR_PRIMARY)
-    doc.text(phone.substring(0, 50), 18.5, y + 21)
-    doc.text(email.substring(0, 50), 108.5, y + 21)
+    doc.text(`Fazenda: ${inputs.propertyData?.farmName || 'Não Informada'}`, 18.5, y + 16.5)
+    if (email) {
+        doc.text(email.substring(0, 30), 153.5, y + 16.5)
+    }
 
     y += PROP_H + 7.5
 
-    // ─── 02. PARÂMETROS DA PASTAGEM ───────────────────────────────────────────
-    drawSectionHeader('02. Parâmetros da Pastagem')
-
-    // Card em Grid de 5 colunas x 2 linhas (Ampliado para tamanho 32mm)
-    const PARAM_H = 32
+    // ─── 02. PARÂMETROS ANALÍTICOS (COLUNAS SIMÉTRICAS) ────────────────────────
+    drawSectionHeader('02. Parâmetros Analíticos')
+    
+    const PANEL_H = 43
     doc.setFillColor(COLOR_BG_LIGHT)
     doc.setDrawColor(COLOR_BORDER)
     doc.setLineWidth(0.15)
-    doc.roundedRect(15, y, 180, PARAM_H, 2, 2, 'FD')
+    doc.roundedRect(15, y, 180, PANEL_H, 2, 2, 'FD')
 
-    const colsX = [18.5, 54.5, 90.5, 126.5, 162.5]
-
-    // Row 1 (Legibilidade máxima das informações de pasto)
-    const pRow1 = [
-        { label: 'ÁREA AMOSTRAL', value: `${inputs.sampleArea} m²` },
-        { label: 'PESO AMOSTRA', value: `${inputs.sampleWeight} kg` },
-        { label: 'MATÉRIA SECA', value: `${inputs.dryMatterPercent}%` },
-        { label: 'OFERTA FORRAGEM', value: `${inputs.forageSupplyPercent}%` },
-        { label: 'PESO VIVO', value: `${inputs.bodyWeight} kg` }
+    // Coluna 1: Pastagem
+    doc.setFontSize(8.5)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(COLOR_EMERALD)
+    doc.text('MANEJO DA PASTAGEM', 18.5, y + 6)
+    
+    const pastagemParams = [
+        { label: 'Área Amostral:', value: `${inputs.sampleArea} m²` },
+        { label: 'Peso Verde da Amostra:', value: `${(inputs.sampleWeight * 1000).toFixed(0)} g` },
+        { label: 'Teor de Matéria Seca (MS):', value: `${inputs.dryMatterPercent}%` },
+        { label: 'Oferta de Forragem (OF):', value: `${inputs.forageSupplyPercent}% do PV` },
+        { label: 'Perda por Indisponibilidade:', value: `${inputs.unavailabilityPercent}%` }
     ]
-
-    pRow1.forEach((item, idx) => {
-        doc.setFontSize(8.5)
-        doc.setFont('helvetica', 'bold')
+    
+    pastagemParams.forEach((p, idx) => {
+        const py = y + 13 + idx * 6.5
+        doc.setFontSize(9)
+        doc.setFont('helvetica', 'normal')
         doc.setTextColor(COLOR_SECONDARY)
-        doc.text(item.label, colsX[idx], y + 6.5)
-
-        doc.setFontSize(10.5)
+        doc.text(p.label, 18.5, py)
+        
         doc.setFont('helvetica', 'bold')
         doc.setTextColor(COLOR_PRIMARY)
-        doc.text(item.value, colsX[idx], y + 12)
+        doc.text(p.value, 68, py)
     })
-
-    // Row 2
-    const categoryLabels: Record<string, string> = {
-        'Bezerro': 'Bezerro/a',
-        'Novilha': 'Novilha/Garrote',
-        'BoiGordo': 'Boi Gordo/Touro',
-        'VacaCria': 'Vaca de Cria',
-        'VacaSeca': 'Vaca Seca'
-    }
-    const catText = categoryLabels[inputs.category] || 'Não Inf.'
-
-    const pRow2 = [
-        { label: 'GPD ESPERADO', value: `${inputs.gpd} kg/dia` },
-        { label: 'CATEGORIA GADO', value: catText },
-        { label: 'DIAS OCUPAÇÃO', value: `${inputs.occupationDays} dias` },
-        { label: 'PERÍODO ENGORDA', value: `${inputs.growthPeriod} dias` },
-        { label: '% INDISPONIB.', value: `${inputs.unavailabilityPercent}%` }
+    
+    // Coluna 2: Dados do Rebanho
+    doc.setFontSize(8.5)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(COLOR_EMERALD)
+    doc.text('DADOS DO REBANHO', 110, y + 6)
+    
+    const rebanhoParams = [
+        { label: 'Categoria de Gado:', value: catText },
+        { label: 'Peso Corporal Médio:', value: `${inputs.bodyWeight} kg` },
+        { label: 'Ganho de Peso Diário (GPD):', value: `${inputs.gpd} kg/dia` },
+        { label: 'Período de Pastejo:', value: `${inputs.growthPeriod} dias` },
+        { label: 'Dias de Ocupação:', value: `${inputs.occupationDays} dias` }
     ]
-
-    pRow2.forEach((item, idx) => {
-        doc.setFontSize(8.5)
-        doc.setFont('helvetica', 'bold')
+    
+    rebanhoParams.forEach((r, idx) => {
+        const py = y + 13 + idx * 6.5
+        doc.setFontSize(9)
+        doc.setFont('helvetica', 'normal')
         doc.setTextColor(COLOR_SECONDARY)
-        doc.text(item.label, colsX[idx], y + 19.5)
-
-        doc.setFontSize(10.5)
+        doc.text(r.label, 110, py)
+        
         doc.setFont('helvetica', 'bold')
         doc.setTextColor(COLOR_PRIMARY)
-        doc.text(item.value, colsX[idx], y + 25)
+        doc.text(r.value, 168, py)
     })
 
-    y += PARAM_H + 7.5
+    y += PANEL_H + 7.5
 
-    // ─── 03. RESULTADOS TÉCNICOS ─────────────────────────────────────────────
+    // ─── 03. RESULTADOS TÉCNICOS (DASHBOARD SYMMETRIC PANEL) ───────────────────
     drawSectionHeader('03. Resultados Técnicos')
 
     const kpis = [
-        { label: 'MASSA DE FORRAGEM', value: `${outputs.forageMass.toFixed(0)} kg MS/ha` },
-        { label: 'CAPACIDADE SUPORTE', value: `${outputs.supportCapacity.toFixed(1)} kg PV/ha` },
-        { label: 'TAXA DE LOTAÇÃO', value: `${outputs.stockingRateUA.toFixed(2)} UA/ha` },
-        { label: 'PRODUTIVIDADE PERÍODO', value: `${outputs.productivity.toFixed(1)} @ / ha` },
+        { label: 'MASSA DE FORRAGEM', value: `${outputs.forageMass.toFixed(0)} kg MS/ha`, desc: 'Disponibilidade de pasto' },
+        { label: 'CAPACIDADE SUPORTE', value: `${outputs.supportCapacity.toFixed(0)} kg PV/ha`, desc: 'Carga recomendada' },
+        { label: 'TAXA DE LOTAÇÃO', value: `${outputs.stockingRateUA.toFixed(2)} UA/ha`, desc: 'UA por hectare útil' },
+        { label: 'PRODUTIVIDADE', value: `${outputs.productivity.toFixed(1)} @ / ha`, desc: 'Arrobas no período' }
     ]
-
-    const cardW = 42
-    const cardH = 26
-    const gap = 4
-
-    kpis.forEach((k, idx) => {
-        const x0 = 15 + idx * (cardW + gap)
-        
-        // Card Background & Border
-        doc.setFillColor('#FFFFFF')
-        doc.setDrawColor(COLOR_BORDER)
-        doc.setLineWidth(0.15)
-        doc.roundedRect(x0, y, cardW, cardH, 1.5, 1.5, 'FD')
-
-        // Traço lateral verde acento
-        doc.setFillColor(COLOR_EMERALD)
-        doc.rect(x0, y, 1.5, cardH, 'F')
-
-        // Label
-        doc.setTextColor(COLOR_SECONDARY)
-        doc.setFontSize(8)
-        doc.setFont('helvetica', 'bold')
-        doc.text(k.label, x0 + 4, y + 7.5)
-
-        // Value (Grandes, pretos e destacados para leitura sob baixa visão)
-        doc.setTextColor(COLOR_PRIMARY)
-        doc.setFontSize(13)
-        doc.setFont('helvetica', 'bold')
-        doc.text(k.value, x0 + 4, y + 18.5)
-    })
-
-    y += cardH + 7.5
-
-    // ─── 04. ESTIMATIVA FINANCEIRA ────────────────────────────────────────────
-    drawSectionHeader('04. Estimativa Financeira')
-
-    // Metade Esquerda: White Panel Card para Receita & Deduções (Ampliado para FIN_H = 32)
-    const FIN_W_LEFT = 95
-    const FIN_H = 32
+    
+    const panelY = y
+    const KPI_PANEL_H = 22
     doc.setFillColor('#FFFFFF')
     doc.setDrawColor(COLOR_BORDER)
     doc.setLineWidth(0.15)
-    doc.roundedRect(15, y, FIN_W_LEFT, FIN_H, 2, 2, 'FD')
+    doc.roundedRect(15, panelY, 180, KPI_PANEL_H, 1.5, 1.5, 'FD')
+    
+    // Divisores verticais
+    doc.setDrawColor(COLOR_BORDER)
+    doc.setLineWidth(0.15)
+    doc.line(60, panelY + 3, 60, panelY + KPI_PANEL_H - 3)
+    doc.line(105, panelY + 3, 105, panelY + KPI_PANEL_H - 3)
+    doc.line(150, panelY + 3, 150, panelY + KPI_PANEL_H - 3)
+    
+    // Conteúdo dos KPIs
+    const colX = [18.5, 63.5, 108.5, 153.5]
+    kpis.forEach((k, idx) => {
+        doc.setFontSize(7.5)
+        doc.setFont('helvetica', 'bold')
+        doc.setTextColor(COLOR_SECONDARY)
+        doc.text(k.label, colX[idx], panelY + 6)
+        
+        doc.setFontSize(11.5)
+        doc.setFont('helvetica', 'bold')
+        doc.setTextColor(COLOR_PRIMARY)
+        doc.text(k.value, colX[idx], panelY + 12.5)
+        
+        doc.setFontSize(7)
+        doc.setFont('helvetica', 'italic')
+        doc.setTextColor(COLOR_MUTED)
+        doc.text(k.desc, colX[idx], panelY + 17.5)
+    })
 
-    doc.setFontSize(9)
+    y += KPI_PANEL_H + 7.5
+
+    // ─── 04. DEMONSTRAÇÃO FINANCEIRA (DRE CORPORATIVA) ────────────────────────
+    drawSectionHeader('04. Demonstrativo de Resultados Financeiros (DRE)')
+
+    const DRE_H = 42
+    doc.setFillColor(COLOR_BG_LIGHT)
+    doc.setDrawColor(COLOR_BORDER)
+    doc.setLineWidth(0.15)
+    doc.roundedRect(15, y, 180, DRE_H, 2, 2, 'FD')
+    
+    // Cabeçalhos da Tabela
+    doc.setFontSize(8)
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(COLOR_SECONDARY)
-    doc.text('FATURAMENTO BRUTO', 20, y + 8.5)
-    doc.text('DEDUÇÕES PREVISTAS', 60, y + 8.5)
-
-    doc.setFontSize(15)
+    doc.text('CONTA / DESCRIÇÃO DO RESULTADO', 20, y + 6)
+    doc.text('INDICAÇÃO E TAXA', 105, y + 6)
+    doc.text('VALOR ESTIMADO', 190, y + 6, { align: 'right' })
+    
+    doc.setDrawColor(COLOR_BORDER)
+    doc.setLineWidth(0.1)
+    doc.line(20, y + 8, 190, y + 8)
+    
+    // Linha 1: Faturamento
+    doc.setFontSize(9)
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(COLOR_PRIMARY)
-    doc.text(money(outputs.revenue), 20, y + 20)
+    doc.text('Faturamento Bruto Projetado', 20, y + 14)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(COLOR_SECONDARY)
+    doc.text('100.0% da receita a pasto', 105, y + 14)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(COLOR_PRIMARY)
+    doc.text(money(outputs.revenue), 190, y + 14, { align: 'right' })
     
+    // Linha 2: Deduções
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(COLOR_PRIMARY)
+    doc.text('(-) Deduções & Perdas de Pastagem', 20, y + 21)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(COLOR_SECONDARY)
+    doc.text(`${inputs.unavailabilityPercent}% de taxa de indisponibilidade`, 105, y + 21)
+    doc.setFont('helvetica', 'bold')
     doc.setTextColor(COLOR_RED)
-    doc.text(`- ${money(outputs.reduction)}`, 60, y + 20)
-
-    // Metade Direita: Emerald Solid Block Card para Lucro Líquido (Ultra-Destacado e Super Acessível!)
-    const FIN_W_RIGHT = 81
-    const xRight = 114
-    doc.setFillColor(COLOR_EMERALD)
+    doc.text(`- ${money(outputs.reduction)}`, 190, y + 21, { align: 'right' })
+    
+    // Linha divisória de totalização
     doc.setDrawColor(COLOR_EMERALD)
-    doc.roundedRect(xRight, y, FIN_W_RIGHT, FIN_H, 2, 2, 'FD')
-
-    // Label Lucro Líquido
+    doc.setLineWidth(0.2)
+    doc.line(20, y + 25, 190, y + 25)
+    
+    // Linha 3: Lucro Líquido
+    doc.setFontSize(10.5)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(COLOR_EMERALD)
+    doc.text('(=) LUCRO LÍQUIDO PROJETADO', 20, y + 32)
+    
     doc.setFontSize(9)
+    doc.setFont('helvetica', 'normal')
+    doc.text(`Preço de Ref: R$/@ ${inputs.pricePerArroba?.toFixed(2) ?? '-'}`, 105, y + 32)
+    
+    doc.setFontSize(13)
     doc.setFont('helvetica', 'bold')
-    doc.setTextColor(COLOR_EMERALD_LIGHT)
-    doc.text('LUCRO LÍQUIDO ESTIMADO', xRight + 5, y + 8.5)
+    doc.setTextColor(COLOR_EMERALD)
+    doc.text(money(outputs.profit), 190, y + 32, { align: 'right' })
 
-    // Valor Lucro Líquido (Super Gigante de 18pt para visibilidade extrema!)
-    doc.setFontSize(18)
-    doc.setFont('helvetica', 'bold')
-    doc.setTextColor('#FFFFFF')
-    doc.text(money(outputs.profit), xRight + 5, y + 20)
-
-    // Subtítulo de Referência
-    doc.setFontSize(9)
-    doc.setFont('helvetica', 'bold')
-    doc.text(`R$/@ ${inputs.pricePerArroba?.toFixed(2) ?? '-'}`, xRight + FIN_W_RIGHT - 5, y + 27, { align: 'right' })
-
-    y += FIN_H + 7.5
+    y += DRE_H + 7.5
 
     // ─── NOTA METODOLÓGICA ───────────────────────────────────────────────────
     const noteText = 'Nota Metodológica: Esta simulação técnica utiliza as diretrizes científicas da Embrapa Pecuária Sul para cálculo da capacidade de suporte e consumo diário de matéria seca. Os resultados financeiros representam estimativas baseadas nos coeficientes produtivos fornecidos pelo produtor e nas condições atuais de mercado, não constituindo garantia de faturamento ou receita futura.'
     
-    // Fundo da nota técnica (mais espaçosa e perfeitamente legível)
     doc.setFillColor(COLOR_BG_LIGHT)
     doc.rect(15, y, 180, 16, 'F')
 
@@ -328,11 +339,9 @@ export const generateProfessionalPDF = async (
     doc.setTextColor(COLOR_SECONDARY)
     doc.text(noteText, 18.5, y + 5, { maxWidth: 173, align: 'justify' })
 
-    // PUSH SIGNATURES DOWN (empurra as assinaturas confortavelmente para a base da folha, agora com muito mais espaço!)
-    y = 246
+    y = 254
 
     // ─── ASSINATURAS E VALIDAÇÃO ─────────────────────────────────────────────
-    // Linha do Produtor
     doc.setDrawColor(COLOR_MUTED)
     doc.setLineWidth(0.15)
     doc.line(25, y, 90, y)
