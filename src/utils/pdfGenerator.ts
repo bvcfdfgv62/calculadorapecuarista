@@ -192,9 +192,18 @@ export const generateProfessionalPDF = async (
     })
 
     // Row 2
+    const categoryLabels: Record<string, string> = {
+        'Bezerro': 'Bezerro/a',
+        'Novilha': 'Novilha/Garrote',
+        'BoiGordo': 'Boi Gordo/Touro',
+        'VacaCria': 'Vaca de Cria',
+        'VacaSeca': 'Vaca Seca'
+    }
+    const catText = categoryLabels[inputs.category] || 'Não Inf.'
+
     const pRow2 = [
         { label: 'GPD ESPERADO', value: `${inputs.gpd} kg/dia` },
-        { label: 'Nº PIQUETES', value: `${inputs.paddockCount}` },
+        { label: 'CATEGORIA GADO', value: catText },
         { label: 'DIAS OCUPAÇÃO', value: `${inputs.occupationDays} dias` },
         { label: 'PERÍODO ENGORDA', value: `${inputs.growthPeriod} dias` },
         { label: '% INDISPONIB.', value: `${inputs.unavailabilityPercent}%` }

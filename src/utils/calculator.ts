@@ -6,7 +6,7 @@ export interface CalculatorInputs {
     paddockCount: number
     occupationDays: number
     growthPeriod: number
-    category: 'Macho' | 'Fêmea'
+    category: 'Bezerro' | 'Novilha' | 'BoiGordo' | 'VacaCria' | 'VacaSeca'
     bodyWeight: number
     gpd: number
     unavailabilityPercent: number

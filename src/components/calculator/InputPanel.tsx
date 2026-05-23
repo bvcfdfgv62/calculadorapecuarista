@@ -82,20 +82,28 @@ export const InputPanel = React.memo(({ inputs, rawValues, handleInputChange, ha
                             <InputField label="Período crescimento (dias)" name="growthPeriod" value={rawValues['growthPeriod'] ?? String(inputs.growthPeriod)} onChange={handleInputChange} required={false} />
                         </div>
 
-                        {/* Category */}
+                        {/* Categoria do Gado */}
                         <div className="space-y-3">
-                            <label className="text-[13px] font-semibold opacity-80" style={{ color: 'var(--muted)' }}>Categoria</label>
-                            <div className="flex items-center gap-12 px-2">
-                                {['Macho', 'Fêmea'].map((cat: any) => (
-                                    <label key={cat} className="flex items-center gap-3 cursor-pointer group">
-                                        <div className="relative flex items-center justify-center">
-                                            <input type="radio" name="category" value={cat} checked={inputs.category === cat} onChange={() => setInputs((p: any) => ({ ...p, category: cat }))} className="sr-only" />
-                                            <div className={`w-5 h-5 rounded-full border-2 transition-all ${inputs.category === cat ? 'border-emerald-500 scale-110' : 'border-slate-300 group-hover:border-slate-400'}`} />
-                                            {inputs.category === cat && <div className="absolute w-2.5 h-2.5 bg-emerald-500 rounded-full" />}
-                                        </div>
-                                        <span className={`text-sm font-medium transition-colors ${inputs.category === cat ? 'text-emerald-600 dark:text-emerald-400' : ''}`} style={inputs.category !== cat ? { color: 'var(--muted)' } : {}}>{cat}</span>
-                                    </label>
-                                ))}
+                            <label className="text-xs font-black uppercase tracking-widest opacity-60 px-1" style={{ color: 'var(--muted)' }}>
+                                Tipo de Gado / Categoria
+                            </label>
+                            <div className="relative">
+                                <select
+                                    name="category"
+                                    value={inputs.category}
+                                    onChange={(e) => setInputs((p: any) => ({ ...p, category: e.target.value as any }))}
+                                    className="w-full py-4 px-5 rounded-2xl border-2 appearance-none cursor-pointer focus:outline-none focus:border-emerald-500 font-bold transition-all text-sm pr-12 shadow-sm"
+                                    style={{ background: 'var(--surface-2)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                                >
+                                    <option value="Bezerro">Bezerro / Bezerra (Desmama)</option>
+                                    <option value="Novilha">Garrote / Novilha (Recria)</option>
+                                    <option value="BoiGordo">Boi Gordo / Touro (Terminação)</option>
+                                    <option value="VacaCria">Vaca de Cria (Lactante)</option>
+                                    <option value="VacaSeca">Vaca Seca / Solteira</option>
+                                </select>
+                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4" style={{ color: 'var(--muted)' }}>
+                                    <ChevronDown size={18} />
+                                </div>
                             </div>
                         </div>
 

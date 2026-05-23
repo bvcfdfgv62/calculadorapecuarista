@@ -16,7 +16,7 @@ const INITIAL_INPUTS: CalculatorInputs = {
     paddockCount: 1,
     occupationDays: 5,
     growthPeriod: 90,
-    category: 'Macho',
+    category: 'BoiGordo',
     bodyWeight: 255,
     gpd: 0.41,
     unavailabilityPercent: 4,
