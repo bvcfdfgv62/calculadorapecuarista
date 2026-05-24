@@ -9,57 +9,74 @@ interface AuthWrapperProps {
 
 export const AuthWrapper = ({ children, view }: AuthWrapperProps) => {
     return (
-        <div className="min-h-screen relative flex items-center justify-center p-4 sm:p-8 bg-gray-50 overflow-hidden font-sans">
-            {/* Background elements to make it look premium (Glassmorphism blobs) */}
-            <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-green-200/40 blur-3xl opacity-70"></div>
-                <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-emerald-200/40 blur-3xl opacity-70"></div>
-                <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] rounded-full bg-blue-100/40 blur-3xl opacity-50"></div>
+        <div className="min-h-screen flex flex-col md:flex-row bg-white font-sans">
+            
+            {/* Lado Esquerdo - Imagem (Oculto no mobile, 50% no Desktop) */}
+            <div className="hidden md:flex md:w-1/2 relative bg-gray-900 overflow-hidden">
+                <div className="absolute inset-0">
+                    <img 
+                        src="https://images.unsplash.com/photo-1592982537447-6f2a6a0c5c10?q=80&w=2000&auto=format&fit=crop" 
+                        className="w-full h-full object-cover opacity-70 mix-blend-overlay" 
+                        alt="Agricultura e Pecuária" 
+                    />
+                </div>
+                {/* Degradê sobre a imagem para leitura do texto */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a1f11] via-transparent to-transparent opacity-90"></div>
+                
+                {/* Overlay Text */}
+                <div className="absolute bottom-0 left-0 p-12 lg:p-16 text-white z-10 w-full">
+                    <h2 className="text-4xl lg:text-5xl font-bold mb-4 leading-tight tracking-tight text-white">
+                        O futuro da gestão<br />pecuária começa aqui.
+                    </h2>
+                    <p className="text-lg text-gray-300 max-w-lg font-medium leading-relaxed">
+                        Acesse as métricas da sua fazenda com precisão, segurança e tecnologia de ponta desenvolvida para o produtor rural.
+                    </p>
+                </div>
             </div>
 
-            {/* Container do Formulário */}
-            <div className="w-full max-w-md relative z-10">
-                <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/50 overflow-hidden">
+            {/* Lado Direito - Formulário */}
+            <div className="w-full md:w-1/2 flex flex-col justify-center px-6 py-12 sm:px-12 lg:px-24 bg-white relative">
+                
+                <div className="w-full max-w-md mx-auto">
                     
-                    {/* Header com Logo - Fixo dentro do card */}
-                    <div className="pt-10 px-8 pb-4 text-center">
-                        <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-white shadow-sm border border-gray-100 mb-6">
-                            <img
-                                src="./logo-corteva.png"
-                                alt="Corteva Agriscience"
-                                className="h-10 w-auto object-contain"
-                            />
-                        </div>
-                        <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                    {/* Cabeçalho do Form e Logo */}
+                    <div className="mb-10 text-center md:text-left">
+                        <img
+                            src="./logo-corteva.png"
+                            alt="Corteva Agriscience"
+                            className="h-16 sm:h-20 w-auto mb-8 mx-auto md:mx-0 object-contain"
+                        />
+                        <h1 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">
                             Calculadora Pecuarista
                         </h1>
-                        <p className="text-gray-500 text-sm mt-1 font-medium">
-                            Gestão fácil para o produtor rural
+                        <p className="text-gray-500 text-base">
+                            Bem-vindo(a) à plataforma oficial.
                         </p>
                     </div>
 
-                    {/* Divisor suave */}
-                    <div className="h-px w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent opacity-50"></div>
-
+                    {/* Formulário animado */}
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={view}
-                            initial={{ opacity: 0, x: 10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -10 }}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
                             transition={{ duration: 0.3, ease: "easeOut" }}
                         >
-                            <React.Suspense fallback={<div className="h-64 flex items-center justify-center"><div className="w-8 h-8 border-2 border-green-600 border-t-transparent rounded-full animate-spin" /></div>}>
+                            <React.Suspense fallback={<div className="h-64 flex items-center justify-center"><div className="w-8 h-8 border-2 border-green-700 border-t-transparent rounded-full animate-spin" /></div>}>
                                 {children}
                             </React.Suspense>
                         </motion.div>
                     </AnimatePresence>
-                </div>
 
-                <div className="mt-8 text-center text-xs font-medium text-gray-400">
-                    <p>© {new Date().getFullYear()} Corteva Agriscience.<br className="sm:hidden" /> Todos os direitos reservados.</p>
+                    {/* Footer */}
+                    <div className="mt-12 text-center md:text-left text-sm text-gray-400 font-medium">
+                        <p>© {new Date().getFullYear()} Corteva Agriscience. Todos os direitos reservados.</p>
+                    </div>
+
                 </div>
             </div>
+            
         </div>
     )
 }

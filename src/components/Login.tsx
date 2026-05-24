@@ -98,13 +98,13 @@ export const Login = ({ setView }: LoginProps) => {
 
                             <form onSubmit={handleForgotPassword} className="space-y-5">
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">E-mail Cadastrado</label>
+                                    <label className="block text-sm font-semibold text-gray-800 mb-2">E-mail Cadastrado</label>
                                     <div className="relative">
                                         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                                            <Mail size={18} />
+                                            <Mail size={20} />
                                         </div>
                                         <input type="email" 
-                                            className="w-full pl-11 pr-4 py-3.5 bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:bg-white outline-none transition-all text-gray-900 font-medium"
+                                            className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#005ea2] focus:border-[#005ea2] outline-none transition-colors text-gray-900 text-lg"
                                             placeholder="seu@email.com"
                                             value={resetEmail}
                                             onChange={(e) => setResetEmail(e.target.value)}
@@ -120,8 +120,8 @@ export const Login = ({ setView }: LoginProps) => {
                                 )}
 
                                 <button type="submit" disabled={resetLoading}
-                                    className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-4 px-4 rounded-xl font-bold text-[1.1rem] transition-all flex items-center justify-center disabled:opacity-70 mt-4 shadow-lg shadow-green-500/30">
-                                    {resetLoading ? <><Loader2 className="w-5 h-5 animate-spin mr-2" />Enviando...</> : 'Enviar E-mail'}
+                                    className="w-full bg-[#005ea2] hover:bg-blue-800 text-white py-4 px-4 rounded-lg font-bold text-lg transition-colors flex items-center justify-center disabled:opacity-70 mt-4">
+                                    {resetLoading ? <><Loader2 className="w-5 h-5 animate-spin mr-2" />Enviando...</> : 'Enviar Instruções'}
                                 </button>
                             </form>
                         </>
@@ -157,24 +157,24 @@ export const Login = ({ setView }: LoginProps) => {
                         </div>
                     )}
 
-                    <div className="mb-6 text-center">
-                        <h2 className="text-xl font-bold text-gray-900 mb-1">
-                            Acessar sua conta
+                    <div className="mb-8">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                            Acesse sua conta
                         </h2>
-                        <p className="text-gray-500 text-sm font-medium">
-                            Informe seus dados para entrar
+                        <p className="text-gray-500 text-base">
+                            Informe seus dados para entrar na plataforma.
                         </p>
                     </div>
 
-                    <form onSubmit={handleLogin} className="space-y-4">
+                    <form onSubmit={handleLogin} className="space-y-6">
                         <div>
-                            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Seu E-mail</label>
+                            <label className="block text-sm font-semibold text-gray-800 mb-2">E-mail corporativo</label>
                             <div className="relative">
                                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                                    <Mail size={18} />
+                                    <Mail size={20} />
                                 </div>
                                 <input type="email" 
-                                    className="w-full pl-11 pr-4 py-3.5 bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:bg-white outline-none transition-all text-gray-900 font-medium"
+                                    className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#005ea2] focus:border-[#005ea2] outline-none transition-colors text-gray-900 text-lg"
                                     placeholder="seu@email.com"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
@@ -184,26 +184,26 @@ export const Login = ({ setView }: LoginProps) => {
 
                         <div>
                             <div className="flex items-center justify-between mb-2">
-                                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">Sua Senha</label>
+                                <label className="block text-sm font-semibold text-gray-800">Senha</label>
                                 <button type="button"
                                     onClick={() => setMode('forgot')}
-                                    className="text-xs font-bold text-green-600 hover:text-green-700 transition-colors">
+                                    className="text-sm font-semibold text-[#005ea2] hover:text-blue-800 transition-colors">
                                     Esqueceu a senha?
                                 </button>
                             </div>
                             <div className="relative">
                                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                                    <Lock size={18} />
+                                    <Lock size={20} />
                                 </div>
                                 <input type={showPassword ? 'text' : 'password'} 
-                                    className="w-full pl-11 pr-12 py-3.5 bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:bg-white outline-none transition-all text-gray-900 font-medium font-mono text-lg tracking-widest placeholder:tracking-normal placeholder:font-sans"
+                                    className="w-full pl-12 pr-12 py-3.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#005ea2] focus:border-[#005ea2] outline-none transition-colors text-gray-900 text-lg"
                                     placeholder="••••••••"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required />
                                 <button type="button" onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1">
-                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors p-1">
+                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                                 </button>
                             </div>
                         </div>
@@ -216,17 +216,17 @@ export const Login = ({ setView }: LoginProps) => {
                         )}
 
                         <button type="submit" disabled={loading}
-                            className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-4 px-4 rounded-xl font-bold text-[1.1rem] transition-all flex items-center justify-center disabled:opacity-70 mt-4 shadow-lg shadow-green-500/30">
-                            {loading ? <><Loader2 className="w-5 h-5 animate-spin mr-2" />Entrando...</> : 'Entrar na Plataforma'}
+                            className="w-full bg-[#005ea2] hover:bg-blue-800 text-white py-4 px-4 rounded-lg font-bold text-lg transition-colors flex items-center justify-center disabled:opacity-70 mt-4">
+                            {loading ? <><Loader2 className="w-5 h-5 animate-spin mr-2" />Autenticando...</> : 'Entrar no Sistema'}
                         </button>
                     </form>
 
-                    <div className="mt-8 pt-6 border-t border-gray-100 text-center">
-                        <p className="text-gray-500 text-sm font-medium">
-                            Ainda não tem acesso?{' '}
+                    <div className="mt-8 pt-6 border-t border-gray-200">
+                        <p className="text-gray-600 text-base">
+                            Primeiro acesso?{' '}
                             <button onClick={() => setView('register')}
-                                className="text-green-600 font-bold hover:text-green-700 transition-colors">
-                                Cadastre-se aqui
+                                className="text-[#005ea2] font-semibold hover:underline">
+                                Solicite seu cadastro
                             </button>
                         </p>
                     </div>
