@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { calculateResults } from '../utils/calculator'
 import type { CalculatorInputs, CalculatorOutputs } from '../utils/calculator'
 import { localDB } from '../lib/storage'
+import localforage from 'localforage'
 import { useAuth } from '../context/AuthContext'
 import { generateProfessionalPDF } from '../utils/pdfGenerator'
 import { Toast } from './calculator/SharedUI'
@@ -24,7 +25,7 @@ const INITIAL_INPUTS: CalculatorInputs = {
 }
 
 export function Calculator() {
-    const { user } = useAuth()
+    const { user, profile } = useAuth()
     const [inputs, setInputs] = useState<CalculatorInputs>(INITIAL_INPUTS)
     const [outputs, setOutputs] = useState<CalculatorOutputs | null>(null)
     const [rawValues, setRawValues] = useState<Record<string, string>>({})
@@ -33,10 +34,53 @@ export function Calculator() {
     const [toast, setToast] = useState<{ m: string, t: 'success' | 'error' } | null>(null)
     const [isCalculated, setIsCalculated] = useState(false)
 
-    // Clear results on any input change
+    // Auto-load draft on mount
+    useEffect(() => {
+        if (!user?.email) return
+        localforage.getItem(`@valerio:draft_${user.email}`).then((draft: any) => {
+            if (draft) {
+                if (draft.inputs) {
+                    setInputs(prev => ({ ...prev, ...draft.inputs, propertyData: prev.propertyData }))
+                }
+                if (draft.rawValues) setRawValues(draft.rawValues)
+            }
+        }).catch(console.error)
+    }, [user?.email])
+
+    // Auto-save draft on inputs/rawValues change
+    useEffect(() => {
+        if (!user?.email) return
+        const timer = setTimeout(() => {
+            localforage.setItem(`@valerio:draft_${user.email}`, { inputs, rawValues }).catch(console.error)
+        }, 1000)
+        return () => clearTimeout(timer)
+    }, [inputs, rawValues, user?.email])
+
+    // Preenche os dados da fazenda automaticamente quando o perfil carrega
+    useEffect(() => {
+        if (profile) {
+            setInputs(prev => ({
+                ...prev,
+                propertyData: {
+                    farmName: prev.propertyData?.farmName || profile.farmName || '',
+                    owner: prev.propertyData?.owner || profile.name || '',
+                    city: prev.propertyData?.city || '',
+                    state: prev.propertyData?.state || '',
+                    phone: prev.propertyData?.phone || profile.phone || '',
+                    email: prev.propertyData?.email || user?.email || ''
+                }
+            }))
+        }
+    }, [profile, user?.email])
+
+    // Clear results on any numeric/technical input change
     useEffect(() => {
         setIsCalculated(false)
-    }, [inputs])
+    }, [
+        inputs.sampleArea, inputs.sampleWeight, inputs.dryMatterPercent, inputs.forageSupplyPercent, 
+        inputs.paddockCount, inputs.occupationDays, inputs.growthPeriod, inputs.category, 
+        inputs.bodyWeight, inputs.gpd, inputs.unavailabilityPercent, inputs.pricePerArroba
+    ])
 
     const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target
@@ -55,10 +99,10 @@ export function Calculator() {
     }, [inputs])
 
     const handleSave = useCallback(async () => {
-        if (!user || !outputs) return
+        if (!user || !user.email || !outputs) return
         setIsSaving(true)
         try {
-            localDB.saveCalculation(inputs, outputs)
+            await localDB.saveCalculation(user.email, inputs, outputs)
             setToast({ m: "Cálculo salvo no seu histórico!", t: 'success' })
         } catch (err: any) {
             setToast({ m: err.message || "Erro ao salvar", t: 'error' })
@@ -72,7 +116,8 @@ export function Calculator() {
         setRawValues({})
         setOutputs(null)
         setIsCalculated(false)
-    }, [])
+        if (user?.email) localforage.removeItem(`@valerio:draft_${user.email}`).catch(console.error)
+    }, [user?.email])
 
     const exportToPDF = useCallback(async () => {
         if (!outputs) return

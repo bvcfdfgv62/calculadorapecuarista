@@ -1,65 +1,98 @@
 import React from 'react'
 import { TrendingUp } from 'lucide-react'
 
-export const DashboardKPI = React.memo(({ label, value, unit, icon, trend, highlight }: any) => (
-    <div className={`kpi-card group relative rounded-2xl p-6 border transition-all duration-300 ${highlight ? 'ring-2 ring-emerald-500/30' : 'hover:border-emerald-500/30'}`}
-        style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-        <div className="flex flex-col h-full">
-            <div className="flex items-start justify-between mb-4">
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 ${highlight ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20' : 'group-hover:bg-emerald-600/15 group-hover:text-emerald-500'}`}
-                    style={!highlight ? { background: 'var(--surface-2)', color: 'var(--muted)' } : {}}>
-                    {React.cloneElement(icon as React.ReactElement<any>, { size: 22 })}
+interface DashboardKPIProps {
+    label: string
+    value: string
+    unit: string
+    icon: React.ReactNode
+    trend: string
+    highlight?: boolean
+}
+
+export const DashboardKPI = React.memo(({
+    label,
+    value,
+    unit,
+    icon,
+    trend,
+    highlight
+}: DashboardKPIProps) => (
+    <div className={`p-5 rounded-xl border transition-all ${highlight ? 'bg-green-50/50 border-green-500 shadow-sm' : 'bg-white border-gray-200 hover:border-gray-300 shadow-sm hover:shadow'}`}>
+        <div className="flex flex-col h-full justify-between gap-4">
+            <div className="flex items-start justify-between">
+                <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${highlight ? 'bg-green-600 text-white shadow-md' : 'bg-gray-50 text-gray-400 border border-gray-100'}`}>
+                    {React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement<any>, { size: 24 }) : icon}
                 </div>
             </div>
-            <div className="space-y-1.5">
-                <p className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-emerald-400">{label}</p>
-                <h3 className="text-3xl font-black leading-none tabular-nums tracking-tight" style={{ color: 'var(--foreground)' }}>{value}</h3>
-                <p className="text-sm font-extrabold text-slate-500 dark:text-emerald-400/70">{unit}</p>
+            
+            <div>
+                <p className="text-sm font-bold text-gray-600 uppercase mb-1">{label}</p>
+                <div className="flex items-baseline gap-1">
+                    <h3 className="text-2xl font-bold text-gray-900 leading-none">{value}</h3>
+                    <span className="text-sm font-semibold text-gray-500">{unit}</span>
+                </div>
             </div>
-            <div className="mt-4 pt-4 border-t" style={{ borderColor: 'var(--border)' }}>
-                <p className="text-xs font-black uppercase tracking-tighter text-emerald-600 dark:text-emerald-400">{trend}</p>
+
+            <div className="mt-2 pt-2 border-t border-gray-200">
+                <p className="text-xs font-bold text-gray-500 uppercase">{trend}</p>
             </div>
         </div>
     </div>
 ))
 
-export const FinancialCard = React.memo(({ label, value, color, negative, featured, icon }: any) => {
+DashboardKPI.displayName = 'DashboardKPI'
+
+interface FinancialCardProps {
+    label?: string
+    value: number
+    color?: string
+    negative?: boolean
+    featured?: boolean
+    icon?: React.ReactNode
+}
+
+export const FinancialCard = React.memo(({
+    label,
+    value,
+    color,
+    negative,
+    featured,
+    icon
+}: FinancialCardProps) => {
     if (featured) {
         return (
-            <div className="financial-card relative overflow-hidden rounded-[2.5rem] p-8 shadow-2xl border border-emerald-500/20"
-                style={{ background: 'linear-gradient(135deg, #064e29 0%, #0d8a43 100%)' }}>
-                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-[50px] rounded-full -mr-16 -mt-16" />
-                <div className="absolute bottom-0 left-0 w-20 h-20 bg-emerald-300/15 rounded-full blur-xl" />
-                <div className="relative z-10 flex flex-col gap-5 animate-sweep">
+            <div className="rounded-xl p-6 border border-green-600 bg-gradient-to-br from-green-700 to-green-800 text-white shadow-lg relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-[40px] rounded-full -mr-16 -mt-16 pointer-events-none" />
+                <div className="relative z-10 flex flex-col gap-3">
                     <div className="flex items-center justify-between">
-                        <p className="text-xs font-black uppercase tracking-widest text-emerald-200">Lucro Líquido</p>
-                        <TrendingUp size={18} className="text-emerald-300" />
+                        <p className="text-sm font-bold uppercase tracking-widest text-green-100">Lucro Líquido</p>
+                        <TrendingUp size={24} className="text-green-300" />
                     </div>
-                    <div className="space-y-2">
-                        <h3 className="text-4xl sm:text-5xl font-black tracking-tight leading-none tabular-nums text-white">
+                    <div>
+                        <h3 className="text-3xl sm:text-4xl font-black leading-none mb-1 tracking-tight">
                             R$ {value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                         </h3>
-                        <p className="text-xs font-black uppercase tracking-wider text-emerald-100">Projeção Estimada</p>
+                        <p className="text-xs font-bold text-green-200 uppercase tracking-widest mt-2">Total Projetado no Período</p>
                     </div>
                 </div>
             </div>
         )
     }
     return (
-        <div className="financial-card relative overflow-hidden rounded-[2.5rem] p-8 border shadow-xl transition-all duration-300 hover:border-emerald-500/20"
-            style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-            <div className="relative z-10 flex flex-col gap-6">
-                <div className="flex items-center justify-between">
-                    <p className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-emerald-400">{label}</p>
-                    {icon && <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-inner" style={{ background: 'var(--surface-2)' }}>{icon}</div>}
-                </div>
-                <div className="space-y-2">
-                    <h3 className={`text-3xl sm:text-4xl font-black tracking-tight leading-none tabular-nums ${color}`}>
-                        {negative ? '-' : ''} R$ {value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                    </h3>
-                    <p className="text-xs font-black uppercase tracking-wider text-slate-400 dark:text-emerald-400/60">Estimativa do Período</p>
-                </div>
+        <div className="rounded-xl p-6 bg-white border border-gray-200 shadow-sm flex flex-col gap-4 hover:shadow transition-shadow">
+            <div className="flex items-center justify-between">
+                <p className="text-sm font-bold text-gray-500 uppercase tracking-wider">{label}</p>
+                {icon && <div className="text-gray-400 bg-gray-50 p-2 rounded-lg border border-gray-100">{icon}</div>}
+            </div>
+            <div>
+                <h3 className={`text-2xl font-black leading-none tracking-tight ${color || 'text-gray-900'}`}>
+                    {negative ? '-' : ''} R$ {value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </h3>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-2">Estimativa do Período</p>
             </div>
         </div>
     )
 })
+
+FinancialCard.displayName = 'FinancialCard'

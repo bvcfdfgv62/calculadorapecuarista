@@ -1,6 +1,6 @@
 export interface CalculatorInputs {
     sampleArea: 1.0 | 0.25
-    sampleWeight: number // Expecting grams now as it's more common
+    sampleWeight: number
     dryMatterPercent: number
     forageSupplyPercent: number
     paddockCount: number
@@ -11,6 +11,8 @@ export interface CalculatorInputs {
     gpd: number
     unavailabilityPercent: number
     pricePerArroba: number
+    pastureArea: number
+    areaUnit: 'ha' | 'alq_sp' | 'alq_mg'
     propertyData?: {
         farmName: string
         owner: string
@@ -44,35 +46,34 @@ export const calculateResults = (inputs: CalculatorInputs): CalculatorOutputs =>
         gpd,
         unavailabilityPercent,
         pricePerArroba,
+        pastureArea,
+        areaUnit
     } = inputs
 
-    // 1. Forage Mass (kg MS/ha)
+    const areaMultiplier = areaUnit === 'alq_sp' ? 2.42 : areaUnit === 'alq_mg' ? 4.84 : 1
+    const totalAreaHa = (pastureArea || 1) * areaMultiplier
+
     const forageMass = sampleArea > 0 ? (sampleWeight * 10000 / sampleArea) * (dryMatterPercent / 100) : 0
-
-    // 2. Useful Mass (kg MS/ha) - just the mass now without efficiency factor
     const usefulMass = forageMass
-
-    // 3. Daily Requirement (kg MS/head/day)
     const dailyRequirement = bodyWeight * (forageSupplyPercent / 100)
+    
+    // Cab/ha
+    const stockingRateHeadsHa = (dailyRequirement > 0 && occupationDays > 0) ? (usefulMass / occupationDays) / dailyRequirement : 0
+    const stockingRateHeads = stockingRateHeadsHa * totalAreaHa
 
-    // 4. Stocking Rate (Cab/ha)
-    const stockingRateHeads = (dailyRequirement > 0 && occupationDays > 0)
-        ? (usefulMass / occupationDays) / dailyRequirement
-        : 0
+    // UA/ha
+    const stockingRateUAHa = (stockingRateHeadsHa * bodyWeight) / 450
+    const stockingRateUA = stockingRateUAHa * totalAreaHa
 
-    // 5. Stocking Rate (UA/ha)
-    const stockingRateUA = (stockingRateHeads * bodyWeight) / 450
+    const supportCapacity = stockingRateHeadsHa * bodyWeight // kg/ha
 
-    // 6. Support Capacity (Total weight capacity in kg/ha)
-    const supportCapacity = stockingRateHeads * bodyWeight
+    // Produtividade Total (@)
+    const productivityHa = (stockingRateHeadsHa * gpd * growthPeriod) / 30
+    const productivity = productivityHa * totalAreaHa
 
-    // 7. Productivity (@)
-    // 1 @ = 30kg gain (assuming 50% carcass yield means 1@ of carcass produced)
-    const productivity = (stockingRateHeads * gpd * growthPeriod) / 30
-
-    // 8. Financials
     const revenue = productivity * pricePerArroba
     const reduction = revenue * (unavailabilityPercent / 100)
+    
     const profit = revenue - reduction
 
     const sanitize = (val: number) => isFinite(val) && !isNaN(val) ? val : 0

@@ -1,40 +1,14 @@
-// Mock seguro do Supabase para evitar erros de compilação e carregamento.
-// Toda a aplicação foi migrada com sucesso para Local-First (100% Offline).
-// Não há mais necessidade de configurar variáveis de ambiente no Vercel/Hostinger!
+import { createClient } from '@supabase/supabase-js'
 
-export const supabase = {
-  auth: {
-    getSession: async () => ({ data: { session: null } }),
-    onAuthStateChange: () => ({
-      data: {
-        subscription: {
-          unsubscribe: () => {}
-        }
-      }
-    }),
-    signOut: async () => {
-      console.log('[Supabase Mock] signOut chamado');
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://kanwmirofvrusrkbirtz.supabase.co'
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_1QHm91RkrZ6Snzgms2F8qw_y8885opC'
+
+export const isMockMode = false
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true,
     },
-  },
-  from: () => ({
-    select: () => ({
-      order: () => ({
-        eq: () => ({
-          single: async () => ({ data: null, error: null }),
-          maybeSingle: async () => ({ data: null, error: null }),
-        }),
-      }),
-    }),
-    delete: () => ({
-      eq: () => ({
-        select: async () => ({ data: [], error: null })
-      })
-    })
-  }),
-  channel: () => ({
-    on: () => ({
-      subscribe: () => ({})
-    })
-  }),
-  removeChannel: () => {}
-} as any
+})
