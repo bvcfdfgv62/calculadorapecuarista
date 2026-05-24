@@ -87,24 +87,24 @@ export const Login = ({ setView }: LoginProps) => {
 
                     {!resetSent ? (
                         <>
-                            <div className="mb-6">
+                            <div className="mb-6 text-center">
                                 <h2 className="text-xl font-bold text-gray-900 mb-1">
                                     Recuperar Senha
                                 </h2>
-                                <p className="text-gray-600 text-sm">
+                                <p className="text-gray-500 text-sm font-medium">
                                     Informe seu e-mail para receber um link de redefinição.
                                 </p>
                             </div>
 
                             <form onSubmit={handleForgotPassword} className="space-y-5">
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-800 mb-1">E-mail Cadastrado</label>
+                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">E-mail Cadastrado</label>
                                     <div className="relative">
-                                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                                             <Mail size={18} />
                                         </div>
                                         <input type="email" 
-                                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-gray-900"
+                                            className="w-full pl-11 pr-4 py-3.5 bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:bg-white outline-none transition-all text-gray-900 font-medium"
                                             placeholder="seu@email.com"
                                             value={resetEmail}
                                             onChange={(e) => setResetEmail(e.target.value)}
@@ -120,7 +120,7 @@ export const Login = ({ setView }: LoginProps) => {
                                 )}
 
                                 <button type="submit" disabled={resetLoading}
-                                    className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-md font-bold text-lg transition-colors flex items-center justify-center disabled:opacity-70">
+                                    className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-4 px-4 rounded-xl font-bold text-[1.1rem] transition-all flex items-center justify-center disabled:opacity-70 mt-4 shadow-lg shadow-green-500/30">
                                     {resetLoading ? <><Loader2 className="w-5 h-5 animate-spin mr-2" />Enviando...</> : 'Enviar E-mail'}
                                 </button>
                             </form>
@@ -157,24 +157,24 @@ export const Login = ({ setView }: LoginProps) => {
                         </div>
                     )}
 
-                    <div className="mb-6">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-1">
-                            Entrar no Sistema
+                    <div className="mb-6 text-center">
+                        <h2 className="text-xl font-bold text-gray-900 mb-1">
+                            Acessar sua conta
                         </h2>
-                        <p className="text-gray-600">
-                            Informe seus dados para acessar.
+                        <p className="text-gray-500 text-sm font-medium">
+                            Informe seus dados para entrar
                         </p>
                     </div>
 
-                    <form onSubmit={handleLogin} className="space-y-5">
+                    <form onSubmit={handleLogin} className="space-y-4">
                         <div>
-                            <label className="block text-sm font-semibold text-gray-800 mb-1">Seu E-mail</label>
+                            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Seu E-mail</label>
                             <div className="relative">
-                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                                     <Mail size={18} />
                                 </div>
                                 <input type="email" 
-                                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-gray-900 text-lg"
+                                    className="w-full pl-11 pr-4 py-3.5 bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:bg-white outline-none transition-all text-gray-900 font-medium"
                                     placeholder="seu@email.com"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
@@ -183,27 +183,27 @@ export const Login = ({ setView }: LoginProps) => {
                         </div>
 
                         <div>
-                            <div className="flex items-center justify-between mb-1">
-                                <label className="block text-sm font-semibold text-gray-800">Sua Senha</label>
+                            <div className="flex items-center justify-between mb-2">
+                                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">Sua Senha</label>
                                 <button type="button"
                                     onClick={() => setMode('forgot')}
-                                    className="text-sm font-bold text-green-600 hover:underline">
+                                    className="text-xs font-bold text-green-600 hover:text-green-700 transition-colors">
                                     Esqueceu a senha?
                                 </button>
                             </div>
                             <div className="relative">
-                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                                     <Lock size={18} />
                                 </div>
                                 <input type={showPassword ? 'text' : 'password'} 
-                                    className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-gray-900 text-lg"
+                                    className="w-full pl-11 pr-12 py-3.5 bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:bg-white outline-none transition-all text-gray-900 font-medium font-mono text-lg tracking-widest placeholder:tracking-normal placeholder:font-sans"
                                     placeholder="••••••••"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required />
                                 <button type="button" onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 p-1">
-                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1">
+                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                 </button>
                             </div>
                         </div>
@@ -216,16 +216,16 @@ export const Login = ({ setView }: LoginProps) => {
                         )}
 
                         <button type="submit" disabled={loading}
-                            className="w-full bg-green-600 hover:bg-green-700 text-white py-4 px-4 rounded-md font-bold text-xl transition-colors flex items-center justify-center disabled:opacity-70 mt-2">
-                            {loading ? <><Loader2 className="w-6 h-6 animate-spin mr-2" />Entrando...</> : 'Entrar'}
+                            className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-4 px-4 rounded-xl font-bold text-[1.1rem] transition-all flex items-center justify-center disabled:opacity-70 mt-4 shadow-lg shadow-green-500/30">
+                            {loading ? <><Loader2 className="w-5 h-5 animate-spin mr-2" />Entrando...</> : 'Entrar na Plataforma'}
                         </button>
                     </form>
 
-                    <div className="mt-8 pt-6 border-t border-gray-200 text-center">
-                        <p className="text-gray-600">
+                    <div className="mt-8 pt-6 border-t border-gray-100 text-center">
+                        <p className="text-gray-500 text-sm font-medium">
                             Ainda não tem acesso?{' '}
                             <button onClick={() => setView('register')}
-                                className="text-green-600 font-bold hover:underline text-lg">
+                                className="text-green-600 font-bold hover:text-green-700 transition-colors">
                                 Cadastre-se aqui
                             </button>
                         </p>
