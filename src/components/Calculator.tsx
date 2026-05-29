@@ -21,7 +21,9 @@ const INITIAL_INPUTS: CalculatorInputs = {
     bodyWeight: 255,
     gpd: 0.41,
     unavailabilityPercent: 4,
-    pricePerArroba: 255
+    pricePerArroba: 255,
+    pastureArea: 100,
+    areaUnit: 'ha'
 }
 
 export function Calculator() {
