@@ -94,11 +94,44 @@ export function Calculator() {
     }, [])
 
     const handleCalculate = useCallback(() => {
-        const res = calculateResults(inputs)
+        const requiredFields = [
+            { key: 'sampleWeight', label: 'Peso colhido (kg)' },
+            { key: 'dryMatterPercent', label: 'Matéria Seca (%)' },
+            { key: 'forageSupplyPercent', label: 'Oferta (OF%)' },
+            { key: 'paddockCount', label: 'Nº de piquetes' },
+            { key: 'occupationDays', label: 'Dias de ocupação' },
+            { key: 'bodyWeight', label: 'Peso do Animal (kg)' },
+            { key: 'gpd', label: 'GPD (kg/dia)' },
+            { key: 'unavailabilityPercent', label: '% de Infestação' },
+            { key: 'pricePerArroba', label: 'Preço da Arroba (R$)' },
+            { key: 'pastureArea', label: 'Área Total do Pasto' },
+        ]
+
+        const currentInputs = { ...inputs }
+        for (const field of requiredFields) {
+            const raw = rawValues[field.key]
+            // Se o usuário apagou o campo, o rawValue será uma string vazia
+            if (raw !== undefined && raw.trim() === '') {
+                setToast({ m: `Preencha o campo obrigatório: ${field.label}`, t: 'error' })
+                return
+            }
+            // Garante que o cálculo vai usar o que está na tela
+            if (raw !== undefined) {
+                const num = parseFloat(raw.replace(',', '.'))
+                if (isNaN(num)) {
+                    setToast({ m: `Valor inválido no campo: ${field.label}`, t: 'error' })
+                    return
+                }
+                (currentInputs as any)[field.key] = num
+            }
+        }
+
+        const res = calculateResults(currentInputs)
         setOutputs(res)
+        setInputs(currentInputs) // Atualiza o estado real com os números válidos da tela
         setIsCalculated(true)
         setToast({ m: "Cálculo processado com sucesso!", t: "success" })
-    }, [inputs])
+    }, [inputs, rawValues])
 
     const handleSave = useCallback(async () => {
         if (!user || !user.email || !outputs) return
