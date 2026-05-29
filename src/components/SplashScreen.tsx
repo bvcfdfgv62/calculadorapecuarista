@@ -13,17 +13,17 @@ export function SplashScreen() {
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 className="flex flex-col items-center bg-white p-10 md:p-14 rounded-3xl shadow-xl border border-gray-200 max-w-sm w-full mx-4"
             >
-                <div className="flex items-center gap-4 mb-8">
+                <div className="flex flex-col items-center gap-6 mb-8 text-center">
                     <img
                         src="./logo-corteva.png"
                         alt="Corteva"
                         className="h-24 md:h-32 w-auto object-contain"
                         onError={(e) => { e.currentTarget.style.display = 'none' }}
                     />
-                    <div className="h-24 w-[2px] bg-gray-200 rounded-full"></div>
-                    <div className="flex flex-col">
-                        <span className="text-xl md:text-2xl font-black text-green-800 uppercase tracking-tighter leading-none">Calculadora</span>
-                        <span className="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-widest mt-1">Pecuarista</span>
+                    <div className="h-[2px] w-16 bg-gray-200 rounded-full"></div>
+                    <div className="flex flex-col items-center">
+                        <span className="text-2xl md:text-3xl font-black text-green-800 uppercase tracking-tighter leading-none">Calculadora</span>
+                        <span className="text-sm md:text-base font-bold text-gray-400 uppercase tracking-widest mt-1">Pecuarista</span>
                     </div>
                 </div>
                 
