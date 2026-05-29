@@ -41,7 +41,7 @@ export const InputField = React.memo(({ label, name, value, onChange, placeholde
                 </span>
             )}
         </div>
-        <input type={type} name={name} value={value ?? ''} onChange={onChange} placeholder={placeholder}
+        <input type={type} inputMode={type === 'text' ? 'decimal' : undefined} name={name} value={value ?? ''} onChange={onChange} placeholder={placeholder}
             className="w-full rounded-lg py-3 px-4 text-base font-semibold placeholder-gray-400 transition-all focus:outline-none border border-gray-200 bg-gray-50 text-gray-900 focus:border-green-600 focus:ring-2 focus:ring-green-600/20 hover:border-gray-300"
         />
     </div>

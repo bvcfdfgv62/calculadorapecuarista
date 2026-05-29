@@ -137,7 +137,8 @@ export const InputPanel = React.memo(({
                         <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">Área Total do Pasto</label>
                         <div className="flex flex-col sm:flex-row gap-3">
                             <input
-                                type="number"
+                                type="text"
+                                inputMode="decimal"
                                 name="pastureArea"
                                 value={rawValues['pastureArea'] ?? String(inputs.pastureArea)}
                                 onChange={handleInputChange}
