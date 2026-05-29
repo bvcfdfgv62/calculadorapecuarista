@@ -41,6 +41,8 @@ const generateUUID = (): string => {
   return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
 }
 
+import { supabase } from './supabase'
+
 export const localDB = {
   // ─── GERENCIAMENTO DE PERFIL (Mantido Síncrono no LocalStorage por ser leve) ───
   getProfile(): UserProfile | null {
@@ -71,30 +73,24 @@ export const localDB = {
     }
   },
 
-  // ─── GERENCIAMENTO DE SIMULAÇÕES (Histórico Assíncrono via IndexedDB) ─────────
+  // ─── GERENCIAMENTO DE SIMULAÇÕES (Histórico Assíncrono via SUPABASE) ─────────
   async getHistory(userEmail: string): Promise<Calculation[]> {
     try {
       if (!userEmail) return []
-      const userKey = `${KEYS.HISTORY}_${userEmail}`
       
-      // Tenta ler do IndexedDB
-      let data = await localforage.getItem<Calculation[]>(userKey)
-      
-      // MIGRATION: Se não tem no IndexedDB, verifica se tem no localStorage e migra
-      if (!data) {
-        const legacyData = localStorage.getItem(userKey)
-        if (legacyData) {
-          data = JSON.parse(legacyData) as Calculation[]
-          await localforage.setItem(userKey, data) // Salva no IndexedDB
-          localStorage.removeItem(userKey) // Remove do localStorage pesado
-        }
-      }
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return []
 
-      if (!data) return []
-      
-      return data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      const { data, error } = await supabase
+        .from('calculations')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+
+      return data as Calculation[]
     } catch (e) {
-      console.error('Erro ao ler histórico do IndexedDB:', e)
+      console.error('Erro ao ler histórico do Supabase:', e)
       return []
     }
   },
@@ -103,13 +99,15 @@ export const localDB = {
     try {
       if (!userEmail) throw new Error('Usuário não identificado.')
       
-      const history = await this.getHistory(userEmail)
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('Usuário não autenticado no Supabase.')
+
       const profile = this.getProfile()
       const farmName = inputs?.propertyData?.farmName || profile?.farmName || 'Minha Fazenda'
       
-      const newCalc: Calculation = {
-        id: generateUUID(),
-        created_at: new Date().toISOString(),
+      const newCalc = {
+        user_id: user.id,
+        user_email: user.email,
         inputs,
         outputs,
         metadata: {
@@ -117,39 +115,49 @@ export const localDB = {
         }
       }
 
-      const updatedHistory = [newCalc, ...history]
-      const userKey = `${KEYS.HISTORY}_${userEmail}`
-      await localforage.setItem(userKey, updatedHistory)
-      
-      return newCalc
-    } catch (e) {
-      console.error('Erro ao salvar cálculo no IndexedDB:', e)
-      throw new Error('Não foi possível salvar a simulação no banco de dados local.')
+      const { data, error } = await supabase
+        .from('calculations')
+        .insert([newCalc])
+        .select()
+        .single()
+
+      if (error) {
+        console.error("Supabase insert error:", error)
+        throw new Error('Não foi possível salvar a simulação na nuvem.')
+      }
+
+      return data as Calculation
+    } catch (e: any) {
+      console.error('Erro ao salvar cálculo no Supabase:', e)
+      throw new Error(e.message || 'Erro de conexão com o banco de dados.')
     }
   },
 
   async deleteCalculation(userEmail: string, id: string): Promise<Calculation[]> {
     try {
       if (!userEmail) return []
-      const history = await this.getHistory(userEmail)
-      const filtered = history.filter(item => item.id !== id)
       
-      const userKey = `${KEYS.HISTORY}_${userEmail}`
-      await localforage.setItem(userKey, filtered)
-      return filtered
+      const { error } = await supabase
+        .from('calculations')
+        .delete()
+        .eq('id', id)
+
+      if (error) throw error
+
+      // Retorna o histórico atualizado após deletar
+      return await this.getHistory(userEmail)
     } catch (e) {
-      console.error('Erro ao deletar cálculo do IndexedDB:', e)
-      throw new Error('Não foi possível excluir esta simulação do seu dispositivo.')
+      console.error('Erro ao deletar cálculo do Supabase:', e)
+      throw new Error('Não foi possível excluir esta simulação da nuvem.')
     }
   },
 
   async clearAllData(): Promise<void> {
     try {
       localStorage.removeItem(KEYS.PROFILE)
-      // Limpa todo o banco de dados localforage
-      await localforage.clear()
     } catch (e) {
       console.error('Erro ao limpar bancos de dados:', e)
     }
   }
 }
+
