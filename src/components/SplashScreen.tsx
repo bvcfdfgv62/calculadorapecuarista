@@ -17,10 +17,10 @@ export function SplashScreen() {
                     <img
                         src="./logo-corteva.png"
                         alt="Corteva"
-                        className="h-16 md:h-20 w-auto object-contain"
+                        className="h-24 md:h-32 w-auto object-contain"
                         onError={(e) => { e.currentTarget.style.display = 'none' }}
                     />
-                    <div className="h-16 w-[2px] bg-gray-200 rounded-full"></div>
+                    <div className="h-24 w-[2px] bg-gray-200 rounded-full"></div>
                     <div className="flex flex-col">
                         <span className="text-xl md:text-2xl font-black text-green-800 uppercase tracking-tighter leading-none">Calculadora</span>
                         <span className="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-widest mt-1">Pecuarista</span>
