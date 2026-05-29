@@ -78,7 +78,7 @@ export const Login = ({ setView }: LoginProps) => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="p-6 sm:p-8"
+                    className="w-full"
                 >
                     <button onClick={() => { setMode('login'); setResetSent(false); setResetError(null) }}
                         className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-green-700 transition-colors mb-6">
@@ -148,7 +148,7 @@ export const Login = ({ setView }: LoginProps) => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="p-6 sm:p-8"
+                    className="w-full"
                 >
                     {isMock && (
                         <div className="mb-6 flex items-start gap-3 p-3 bg-yellow-50 border border-yellow-200 rounded-md text-sm text-yellow-800">

@@ -66,7 +66,7 @@ export const FinancialCard = React.memo(({
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-[40px] rounded-full -mr-16 -mt-16 pointer-events-none" />
                 <div className="relative z-10 flex flex-col gap-3">
                     <div className="flex items-center justify-between">
-                        <p className="text-sm font-bold uppercase tracking-widest text-green-100">Lucro Líquido</p>
+                        <p className="text-sm font-bold uppercase tracking-widest text-green-100">{label || 'Destaque'}</p>
                         <TrendingUp size={24} className="text-green-300" />
                     </div>
                     <div>

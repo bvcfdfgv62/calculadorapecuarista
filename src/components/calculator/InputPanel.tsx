@@ -70,7 +70,7 @@ export const InputPanel = React.memo(({
                     {/* Sample area selector */}
                     <div className="space-y-3">
                         <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">Tamanho da Área Amostral</label>
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {[1.0, 0.25].map(val => (
                                 <button key={val}
                                     onClick={() => setInputs((p) => ({ ...p, sampleArea: val as 1.0 | 0.25 }))}
@@ -85,15 +85,15 @@ export const InputPanel = React.memo(({
 
                     {/* Main parameter inputs */}
                     <div className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <InputField label="Peso colhido (kg)" name="sampleWeight" value={rawValues['sampleWeight'] ?? String(inputs.sampleWeight)} onChange={handleInputChange} tooltip="Peso verde colhido" />
                             <InputField label="Matéria Seca (%)" name="dryMatterPercent" value={rawValues['dryMatterPercent'] ?? String(inputs.dryMatterPercent)} onChange={handleInputChange} tooltip="Ex: 25" />
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <InputField label="Oferta (OF%)" name="forageSupplyPercent" value={rawValues['forageSupplyPercent'] ?? String(inputs.forageSupplyPercent)} onChange={handleInputChange} tooltip="Ex: 10" />
                             <InputField label="Nº de piquetes" name="paddockCount" value={rawValues['paddockCount'] ?? String(inputs.paddockCount)} onChange={handleInputChange} />
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <InputField label="Dias de ocupação" name="occupationDays" value={rawValues['occupationDays'] ?? String(inputs.occupationDays)} onChange={handleInputChange} />
                             <InputField label="Período de descanso" name="growthPeriod" value={rawValues['growthPeriod'] ?? String(inputs.growthPeriod)} onChange={handleInputChange} required={false} />
                         </div>
@@ -122,11 +122,11 @@ export const InputPanel = React.memo(({
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4 pt-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                             <InputField label="Peso do Animal (kg)" name="bodyWeight" value={rawValues['bodyWeight'] ?? String(inputs.bodyWeight)} onChange={handleInputChange} />
-                            <InputField label="Perda/Indisponível (%)" name="unavailabilityPercent" value={rawValues['unavailabilityPercent'] ?? String(inputs.unavailabilityPercent)} onChange={handleInputChange} />
+                            <InputField label="% de Infestação" name="unavailabilityPercent" value={rawValues['unavailabilityPercent'] ?? String(inputs.unavailabilityPercent)} onChange={handleInputChange} />
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <InputField label="GPD (kg/dia)" name="gpd" value={rawValues['gpd'] ?? String(inputs.gpd)} onChange={handleInputChange} />
                             <InputField label="Preço da Arroba (R$)" name="pricePerArroba" value={rawValues['pricePerArroba'] ?? String(inputs.pricePerArroba)} onChange={handleInputChange} />
                         </div>
@@ -135,7 +135,7 @@ export const InputPanel = React.memo(({
                     {/* Área Total */}
                     <div className="space-y-3 pt-2">
                         <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">Área Total do Pasto</label>
-                        <div className="flex gap-3">
+                        <div className="flex flex-col sm:flex-row gap-3">
                             <input
                                 type="number"
                                 name="pastureArea"
@@ -147,7 +147,7 @@ export const InputPanel = React.memo(({
                                 name="areaUnit"
                                 value={inputs.areaUnit}
                                 onChange={(e) => setInputs(p => ({ ...p, areaUnit: e.target.value as any }))}
-                                className="w-36 rounded-md px-2 py-2 border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 font-semibold"
+                                className="w-full sm:w-36 rounded-md px-2 py-2 border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 font-semibold"
                             >
                                 <option value="ha">Hectares</option>
                                 <option value="alq_sp">Alq. SP (2.42)</option>
@@ -175,11 +175,11 @@ export const InputPanel = React.memo(({
                             <div className="p-4 border-t border-gray-200 bg-white space-y-4">
                                 <InputField label="Nome da Fazenda" name="farmName" value={inputs.propertyData?.farmName ?? ''} onChange={handlePropertyChange} required={false} />
                                 <InputField label="Proprietário" name="owner" value={inputs.propertyData?.owner ?? ''} onChange={handlePropertyChange} required={false} />
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <InputField label="Cidade" name="city" value={inputs.propertyData?.city ?? ''} onChange={handlePropertyChange} required={false} />
                                     <InputField label="Estado (UF)" name="state" value={inputs.propertyData?.state ?? ''} onChange={handlePropertyChange} required={false} />
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <InputField label="Telefone" name="phone" value={inputs.propertyData?.phone ?? ''} onChange={handlePropertyChange} required={false} />
                                     <InputField label="E-mail" name="email" value={inputs.propertyData?.email ?? ''} onChange={handlePropertyChange} required={false} />
                                 </div>

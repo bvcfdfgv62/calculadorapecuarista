@@ -62,7 +62,7 @@ export const Register = ({ setView }: RegisterProps) => {
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="p-6 sm:p-8 text-center"
+                className="w-full text-center"
             >
                 <div className="w-16 h-16 bg-[#005ea2]/10 rounded-full flex items-center justify-center mx-auto mb-6">
                     <CheckCircle2 size={32} className="text-[#005ea2]" />
@@ -82,7 +82,7 @@ export const Register = ({ setView }: RegisterProps) => {
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="p-6 sm:p-8"
+            className="w-full"
         >
             {isMock && (
                 <div className="mb-5 flex items-start gap-3 p-3 bg-yellow-50/80 border border-yellow-200 rounded-xl text-sm text-yellow-800">
@@ -101,7 +101,7 @@ export const Register = ({ setView }: RegisterProps) => {
             </div>
 
             <form onSubmit={handleRegister} className="space-y-5">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm font-semibold text-gray-800 mb-2">Nome</label>
                         <div className="relative">
@@ -152,7 +152,7 @@ export const Register = ({ setView }: RegisterProps) => {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm font-semibold text-gray-800 mb-2">Senha</label>
                         <div className="relative">

@@ -31,13 +31,15 @@ export const ResultsPanel = React.memo(({
         const farm = inputs.propertyData?.farmName || "Minha Fazenda"
         let msg = `*RESUMO DA SIMULAÇÃO - ${farm}*\n\n`
         msg += `*Financeiro:*\n`
-        msg += `- Receita: R$ ${outputs.revenue.toLocaleString('pt-BR')}\n`
-        msg += `- Perdas de Pasto: R$ ${outputs.reduction.toLocaleString('pt-BR')}\n`
-        msg += `- Lucro Líquido: R$ ${outputs.profit.toLocaleString('pt-BR')}\n\n`
+        msg += `- Receita Estimada por hectare: R$ ${outputs.revenueHa.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n`
+        msg += `- Redução de Receita por Hectare: R$ ${outputs.reductionHa.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n\n`
         msg += `*Produtivo:*\n`
-        msg += `- Cabeças Totais: ${outputs.stockingRateHeads.toFixed(1)}\n`
+        msg += `- KG MS/HA: ${outputs.forageMass.toFixed(0)}\n`
+        msg += `- KG Peso Corporal: ${outputs.supportCapacity.toFixed(0)}\n`
         msg += `- Lotação Total (UA): ${outputs.stockingRateUA.toFixed(1)}\n`
-        msg += `- Produtividade (@ Totais): ${outputs.productivity.toFixed(1)}\n\n`
+        msg += `- Lotação (cab/ha): ${outputs.stockingRateHeadsHa.toFixed(1)}\n`
+        msg += `- Lotação Instantânea (cab/ha): ${(outputs.stockingRateHeadsHa * inputs.paddockCount).toFixed(1)}\n`
+        msg += `- Produtividade (@/ha): ${outputs.productivityHa.toFixed(1)}\n\n`
         msg += `_Gerado por Calculadora Pecuarista_`
         const url = `https://wa.me/?text=${encodeURIComponent(msg)}`
         window.open(url, '_blank')
@@ -82,20 +84,21 @@ export const ResultsPanel = React.memo(({
             <>
                 <div className="space-y-4">
                     <SectionDivider label="Resumo Zootécnico" />
-                    <div className="grid grid-cols-2 gap-4">
-                        <DashboardKPI label="Massa de Forragem" value={outputs.forageMass.toFixed(0)} unit="kg MS/ha" icon={null} trend="Capacidade" />
-                        <DashboardKPI label="Suporte" value={outputs.supportCapacity.toFixed(0)} unit="kg PV/ha" icon={null} trend="Potencial" />
-                        <DashboardKPI label="Lotação Total" value={outputs.stockingRateUA.toFixed(2)} unit="UA" icon={null} trend="Ajuste" />
-                        <DashboardKPI label="Produtividade Total" value={outputs.productivity.toFixed(1)} unit="@" icon={null} trend="Resultado" highlight={true} />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        <DashboardKPI label="KG MS/HA" value={outputs.forageMass.toFixed(0)} unit="" icon={null} trend="Forragem" />
+                        <DashboardKPI label="KG Peso Corporal" value={outputs.supportCapacity.toFixed(0)} unit="/ha" icon={null} trend="Suporte" />
+                        <DashboardKPI label="Lotação Total" value={outputs.stockingRateUA.toFixed(2)} unit="UA" icon={null} trend="Capacidade" />
+                        <DashboardKPI label="Lotação" value={outputs.stockingRateHeadsHa.toFixed(2)} unit="cab/ha" icon={null} trend="Média" />
+                        <DashboardKPI label="Cabeça por hectare instantânea e real" value={(outputs.stockingRateHeadsHa * inputs.paddockCount).toFixed(2)} unit="cab/ha" icon={null} trend="Piquete" />
+                        <DashboardKPI label="Produtividade" value={outputs.productivityHa.toFixed(2)} unit="@/ha" icon={null} trend="Resultado" highlight={true} />
                     </div>
                 </div>
 
                 <div className="space-y-4 pt-2">
                     <SectionDivider label="Estimativa Financeira" />
                     <div className="grid grid-cols-1 gap-4">
-                        <FinancialCard label="Faturamento Bruto Projetado" value={outputs.revenue} color="text-gray-900" />
-                        <FinancialCard label="Perdas / Deduções de Pasto" value={outputs.reduction} color="text-red-700" negative={true} />
-                        <FinancialCard label="Lucro Líquido Real" value={outputs.profit} featured={true} />
+                        <FinancialCard label="Receita Estimada por hectare" value={outputs.revenueHa} featured={true} />
+                        <FinancialCard label="Redução de Receita por Hectare" value={outputs.reductionHa} color="text-red-700" negative={true} />
                     </div>
                 </div>
 

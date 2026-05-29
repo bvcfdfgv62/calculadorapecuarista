@@ -127,7 +127,7 @@ export const generateProfessionalPDF = async (
         { label: 'Peso Verde Colhido:', val: `${(inputs.sampleWeight * 1000).toFixed(0)} g` },
         { label: 'Matéria Seca (MS):', val: `${inputs.dryMatterPercent}%` },
         { label: 'Oferta de Forragem:', val: `${inputs.forageSupplyPercent}%` },
-        { label: 'Perda/Indisponível:', val: `${inputs.unavailabilityPercent}%` }
+        { label: '% de Infestação:', val: `${inputs.unavailabilityPercent}%` }
     ]
 
     const col2 = [
@@ -160,11 +160,12 @@ export const generateProfessionalPDF = async (
     addSectionTitle('Resultados Zootécnicos')
 
     const results = [
-        { label: 'Massa de Forragem', val: `${outputs.forageMass.toFixed(0)} kg MS/ha` },
-        { label: 'Capacidade de Suporte', val: `${outputs.supportCapacity.toFixed(0)} kg PV/ha` },
-        { label: 'Taxa de Lotação (UA)', val: `${outputs.stockingRateUA.toFixed(2)} UA/ha` },
-        { label: 'Taxa de Lotação (Cab)', val: `${outputs.stockingRateHeads.toFixed(1)} cabeças/ha` },
-        { label: 'Produtividade Estimada', val: `${outputs.productivity.toFixed(1)} @/ha` }
+        { label: 'KG MS/HA', val: `${outputs.forageMass.toFixed(0)} kg` },
+        { label: 'KG Peso Corporal', val: `${outputs.supportCapacity.toFixed(0)} kg/ha` },
+        { label: 'Lotação Total (UA)', val: `${outputs.stockingRateUA.toFixed(1)} UA` },
+        { label: 'Lotação', val: `${outputs.stockingRateHeadsHa.toFixed(1)} cab/ha` },
+        { label: 'Lotação Instantânea', val: `${(outputs.stockingRateHeadsHa * inputs.paddockCount).toFixed(1)} cab/ha` },
+        { label: 'Produtividade', val: `${outputs.productivityHa.toFixed(1)} @/ha` }
     ]
 
     // Create a clean zebra table
@@ -192,8 +193,8 @@ export const generateProfessionalPDF = async (
     addSectionTitle('Projeção Financeira por Hectare')
 
     const fin = [
-        { label: 'Receita Bruta Estimada', val: formatMoney(outputs.revenue) },
-        { label: `Deduções Estimadas (${inputs.unavailabilityPercent}%)`, val: `- ${formatMoney(outputs.reduction)}` }
+        { label: 'Receita Estimada por hectare', val: formatMoney(outputs.revenueHa) },
+        { label: `Redução de Receita por Hectare (${inputs.unavailabilityPercent}%)`, val: `- ${formatMoney(outputs.reductionHa)}` }
     ]
 
     fin.forEach((row, i) => {
@@ -211,16 +212,6 @@ export const generateProfessionalPDF = async (
         y += 8
     })
 
-    // Linha de total
-    doc.setDrawColor(GREEN_PRIMARY)
-    doc.setLineWidth(0.5)
-    doc.line(15, y - 1, 195, y - 1)
-    
-    doc.setFontSize(10)
-    doc.setFont('helvetica', 'bold')
-    doc.setTextColor(GREEN_PRIMARY)
-    doc.text('Lucro Líquido Projetado', 20, y + 5)
-    doc.text(formatMoney(outputs.profit), 190, y + 5, { align: 'right' })
 
     // --- FOOTER ---
     const pageHeight = doc.internal.pageSize.height

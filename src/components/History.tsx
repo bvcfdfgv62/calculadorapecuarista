@@ -35,8 +35,8 @@ export const CalculationHistory = () => {
 
     const [search, setSearch] = useState('')
     const [dateFilter, setDateFilter] = useState<DateFilter>('all')
-    const [minProfit, setMinProfit] = useState('')
-    const [maxProfit, setMaxProfit] = useState('')
+    const [minRevenue, setMinRevenue] = useState('')
+    const [maxRevenue, setMaxRevenue] = useState('')
     const [showFilters, setShowFilters] = useState(false)
 
     const fetchHistory = useCallback(async () => {
@@ -69,14 +69,14 @@ export const CalculationHistory = () => {
                 const from = new Date(now.getTime() - days * 86400_000)
                 if (new Date(r.created_at) < from) return false
             }
-            const profit = r.outputs?.profit ?? 0
-            if (minProfit && profit < parseFloat(minProfit)) return false
-            if (maxProfit && profit > parseFloat(maxProfit)) return false
+            const revenue = r.outputs?.revenueHa ?? 0
+            if (minRevenue && revenue < parseFloat(minRevenue)) return false
+            if (maxRevenue && revenue > parseFloat(maxRevenue)) return false
             return true
         })
-    }, [history, search, dateFilter, minProfit, maxProfit])
+    }, [history, search, dateFilter, minRevenue, maxRevenue])
 
-    const hasActiveFilters = search || dateFilter !== 'all' || minProfit || maxProfit
+    const hasActiveFilters = search || dateFilter !== 'all' || minRevenue || maxRevenue
 
     const requestDelete = (e: React.MouseEvent, id: string) => { e.stopPropagation(); setPendingDeleteId(id) }
 
@@ -97,9 +97,8 @@ export const CalculationHistory = () => {
         const farm = record.inputs?.propertyData?.farmName || "Minha Fazenda"
         let msg = `*RESUMO DA SIMULAÇÃO - ${farm}*\n\n`
         msg += `*Financeiro:*\n`
-        msg += `- Receita: R$ ${record.outputs?.revenue?.toLocaleString('pt-BR')}\n`
-        msg += `- Perdas de Pasto: R$ ${record.outputs?.reduction?.toLocaleString('pt-BR')}\n`
-        msg += `- Lucro Líquido Real: R$ ${record.outputs?.profit?.toLocaleString('pt-BR')}\n\n`
+        msg += `- Receita Estimada por hectare: R$ ${record.outputs?.revenueHa?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n`
+        msg += `- Redução de Receita por Hectare: R$ ${record.outputs?.reductionHa?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n\n`
         msg += `*Produtivo:*\n`
         msg += `- Cabeças Totais: ${record.outputs?.stockingRateHeads?.toFixed(1)}\n`
         msg += `- Lotação Total (UA): ${record.outputs?.stockingRateUA?.toFixed(1)}\n`
@@ -125,9 +124,8 @@ export const CalculationHistory = () => {
             'Area(m2)',
             'MateriaSeca(%)',
             'Lotacao(UA)',
-            'Receita(R$)',
-            'Deducoes(R$)',
-            'LucroLiquido(R$)'
+            'ReceitaPorHectare(R$)',
+            'ReducaoPorHectare(R$)'
         ]
 
         const rows = filtered.map(r => {
@@ -140,9 +138,8 @@ export const CalculationHistory = () => {
             const area = r.inputs?.sampleArea || ''
             const dm = r.inputs?.dryMatterPercent || ''
             const uas = r.outputs?.stockingRateUA || 0
-            const rev = r.outputs?.revenue || 0
-            const red = r.outputs?.reduction || 0
-            const profit = r.outputs?.profit || 0
+            const revHa = r.outputs?.revenueHa || 0
+            const redHa = r.outputs?.reductionHa || 0
 
             return [
                 date,
@@ -154,9 +151,8 @@ export const CalculationHistory = () => {
                 area,
                 dm,
                 uas.toString().replace('.', ','),
-                rev.toString().replace('.', ','),
-                red.toString().replace('.', ','),
-                profit.toString().replace('.', ',')
+                revHa.toString().replace('.', ','),
+                redHa.toString().replace('.', ',')
             ].join(';')
         })
 
@@ -264,13 +260,13 @@ export const CalculationHistory = () => {
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-bold text-gray-700">Faixa de Lucro (R$)</label>
+                                <label className="text-sm font-bold text-gray-700">Faixa de Receita/ha (R$)</label>
                                 <div className="flex gap-2 items-center">
-                                    <input type="number" value={minProfit} onChange={e => setMinProfit(e.target.value)} placeholder="Mínimo" className="flex-1 rounded-md px-3 py-2 border border-gray-300 text-base" />
+                                    <input type="number" value={minRevenue} onChange={e => setMinRevenue(e.target.value)} placeholder="Mínimo" className="flex-1 rounded-md px-3 py-2 border border-gray-300 text-base" />
                                     <span className="text-gray-500 font-bold">até</span>
-                                    <input type="number" value={maxProfit} onChange={e => setMaxProfit(e.target.value)} placeholder="Máximo" className="flex-1 rounded-md px-3 py-2 border border-gray-300 text-base" />
-                                    {(minProfit || maxProfit) && (
-                                        <button onClick={() => { setMinProfit(''); setMaxProfit('') }} className="p-2 text-red-500 hover:text-red-700">Limpar</button>
+                                    <input type="number" value={maxRevenue} onChange={e => setMaxRevenue(e.target.value)} placeholder="Máximo" className="flex-1 rounded-md px-3 py-2 border border-gray-300 text-base" />
+                                    {(minRevenue || maxRevenue) && (
+                                        <button onClick={() => { setMinRevenue(''); setMaxRevenue('') }} className="p-2 text-red-500 hover:text-red-700">Limpar</button>
                                     )}
                                 </div>
                             </div>
@@ -305,7 +301,7 @@ export const CalculationHistory = () => {
                                             </span>
                                         </div>
                                         <p className="text-sm font-medium text-gray-600 mt-1">
-                                            Lucro Líquido: <span className="font-bold text-green-700">R$ {record.outputs.profit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                                            Receita Estimada: <span className="font-bold text-green-700">R$ {record.outputs.revenueHa?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/ha</span>
                                         </p>
                                     </div>
                                 </div>
@@ -347,20 +343,15 @@ export const CalculationHistory = () => {
                                         )}
                                     </div>
                                     <div className="bg-green-700 text-white p-5 rounded-lg shadow-inner">
-                                        <h4 className="text-sm font-bold text-green-200 uppercase mb-4">Financeiro</h4>
+                                        <h4 className="text-sm font-bold text-green-200 uppercase mb-4">Financeiro por Hectare</h4>
                                         <div className="space-y-2">
                                             <div className="flex justify-between text-sm">
-                                                <span>Receita Bruta</span>
-                                                <span className="font-bold">R$ {record.outputs.revenue.toLocaleString('pt-BR')}</span>
+                                                <span>Receita Estimada</span>
+                                                <span className="font-bold">R$ {record.outputs.revenueHa?.toLocaleString('pt-BR')}</span>
                                             </div>
                                             <div className="flex justify-between text-sm text-red-200">
-                                                <span>Deduções</span>
-                                                <span className="font-bold">- R$ {record.outputs.reduction.toLocaleString('pt-BR')}</span>
-                                            </div>
-                                            <div className="h-px bg-green-500 my-2" />
-                                            <div className="flex flex-col pt-1">
-                                                <span className="text-xs uppercase text-green-200 font-bold mb-1">Lucro Líquido</span>
-                                                <span className="text-2xl font-bold">R$ {record.outputs.profit.toLocaleString('pt-BR')}</span>
+                                                <span>Redução de Receita</span>
+                                                <span className="font-bold">- R$ {record.outputs.reductionHa?.toLocaleString('pt-BR')}</span>
                                             </div>
                                         </div>
                                     </div>

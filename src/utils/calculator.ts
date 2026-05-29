@@ -27,10 +27,15 @@ export interface CalculatorOutputs {
     forageMass: number
     supportCapacity: number
     stockingRateUA: number
+    stockingRateUAHa: number
     stockingRateHeads: number
+    stockingRateHeadsHa: number
     productivity: number
+    productivityHa: number
     revenue: number
+    revenueHa: number
     reduction: number
+    reductionHa: number
     profit: number
 }
 
@@ -71,7 +76,9 @@ export const calculateResults = (inputs: CalculatorInputs): CalculatorOutputs =>
     const productivityHa = (stockingRateHeadsHa * gpd * growthPeriod) / 30
     const productivity = productivityHa * totalAreaHa
 
+    const revenueHa = productivityHa * pricePerArroba
     const revenue = productivity * pricePerArroba
+    const reductionHa = revenueHa * (unavailabilityPercent / 100)
     const reduction = revenue * (unavailabilityPercent / 100)
     
     const profit = revenue - reduction
@@ -82,10 +89,15 @@ export const calculateResults = (inputs: CalculatorInputs): CalculatorOutputs =>
         forageMass: Math.round(sanitize(forageMass) * 100) / 100,
         supportCapacity: Math.round(sanitize(supportCapacity) * 100) / 100,
         stockingRateUA: Math.round(sanitize(stockingRateUA) * 100) / 100,
+        stockingRateUAHa: Math.round(sanitize(stockingRateUAHa) * 100) / 100,
         stockingRateHeads: Math.round(sanitize(stockingRateHeads) * 100) / 100,
+        stockingRateHeadsHa: Math.round(sanitize(stockingRateHeadsHa) * 100) / 100,
         productivity: Math.round(sanitize(productivity) * 100) / 100,
+        productivityHa: Math.round(sanitize(productivityHa) * 100) / 100,
         revenue: Math.round(sanitize(revenue) * 100) / 100,
+        revenueHa: Math.round(sanitize(revenueHa) * 100) / 100,
         reduction: Math.round(sanitize(reduction) * 100) / 100,
+        reductionHa: Math.round(sanitize(reductionHa) * 100) / 100,
         profit: Math.round(sanitize(profit) * 100) / 100,
     }
 }
