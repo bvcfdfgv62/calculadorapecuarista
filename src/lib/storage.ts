@@ -192,7 +192,7 @@ export const localDB = {
 
       if (error) {
         console.error("Supabase insert error:", error)
-        throw new Error('Não foi possível salvar a simulação na nuvem.')
+        throw new Error(error.message || 'Erro desconhecido no banco.')
       }
 
       // Converte de volta pro formato JSON pro React não quebrar na mesma hora da tela
