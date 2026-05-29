@@ -19,7 +19,7 @@ export const AuthWrapper = ({ children, view }: AuthWrapperProps) => {
                     <img
                         src="./logo-corteva.png"
                         alt="Corteva Agriscience"
-                        className="h-16 sm:h-20 w-auto mb-8 mx-auto object-contain"
+                        className="h-24 sm:h-32 w-auto mb-8 mx-auto object-contain"
                     />
                     <h1 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">
                         Calculadora Pecuarista

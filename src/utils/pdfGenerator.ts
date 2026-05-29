@@ -47,8 +47,8 @@ export const generateProfessionalPDF = async (
 
     // --- HEADER ---
     if (logo) {
-        const LOGO_H = 15
-        const LOGO_W = Math.min(LOGO_H * logo.w / logo.h, 60)
+        const LOGO_H = 22
+        const LOGO_W = Math.min(LOGO_H * logo.w / logo.h, 80)
         doc.addImage(logo.dataUrl, 'PNG', 15, 15, LOGO_W, LOGO_H)
     }
 
