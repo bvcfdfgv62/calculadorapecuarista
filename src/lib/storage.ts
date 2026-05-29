@@ -73,7 +73,7 @@ export const localDB = {
     }
   },
 
-  // ─── GERENCIAMENTO DE SIMULAÇÕES (Histórico Assíncrono via SUPABASE) ─────────
+  // ─── GERENCIAMENTO DE SIMULAÇÕES (Histórico Assíncrono via SUPABASE ENTERPRISE) ─────────
   async getHistory(userEmail: string): Promise<Calculation[]> {
     try {
       if (!userEmail) return []
@@ -88,7 +88,49 @@ export const localDB = {
 
       if (error) throw error
 
-      return data as Calculation[]
+      // Reconstrói o formato que o React espera (separando inputs e outputs)
+      return data.map((row: any) => ({
+        id: row.id,
+        created_at: row.created_at,
+        inputs: {
+          sampleArea: row.sample_area,
+          sampleWeight: row.sample_weight,
+          dryMatterPercent: row.dry_matter_percent,
+          forageSupplyPercent: row.forage_supply_percent,
+          paddockCount: row.paddock_count,
+          occupationDays: row.occupation_days,
+          growthPeriod: row.growth_period,
+          category: row.category,
+          bodyWeight: row.body_weight,
+          gpd: row.gpd,
+          unavailabilityPercent: row.unavailability_percent,
+          pricePerArroba: row.price_per_arroba,
+          pastureArea: row.pasture_area,
+          areaUnit: row.area_unit,
+          propertyData: {
+            farmName: row.farm_name,
+            owner: '', city: '', state: '', phone: '', email: row.user_email
+          }
+        },
+        outputs: {
+          forageMass: row.forage_mass,
+          supportCapacity: row.support_capacity,
+          stockingRateUA: row.stocking_rate_ua,
+          stockingRateUAHa: row.stocking_rate_ua_ha,
+          stockingRateHeads: row.stocking_rate_heads,
+          stockingRateHeadsHa: row.stocking_rate_heads_ha,
+          productivity: row.productivity,
+          productivityHa: row.productivity_ha,
+          revenue: row.revenue,
+          revenueHa: row.revenue_ha,
+          reduction: row.reduction,
+          reductionHa: row.reduction_ha,
+          profit: row.profit
+        },
+        metadata: {
+          ranch_name: row.farm_name,
+        }
+      })) as Calculation[]
     } catch (e) {
       console.error('Erro ao ler histórico do Supabase:', e)
       return []
@@ -105,19 +147,46 @@ export const localDB = {
       const profile = this.getProfile()
       const farmName = inputs?.propertyData?.farmName || profile?.farmName || 'Minha Fazenda'
       
-      const newCalc = {
+      const flatRow = {
         user_id: user.id,
         user_email: user.email,
-        inputs,
-        outputs,
-        metadata: {
-          ranch_name: farmName,
-        }
+        farm_name: farmName,
+
+        sample_area: inputs.sampleArea,
+        sample_weight: inputs.sampleWeight,
+        dry_matter_percent: inputs.dryMatterPercent,
+        forage_supply_percent: inputs.forageSupplyPercent,
+        paddock_count: inputs.paddockCount,
+        occupation_days: inputs.occupationDays,
+        growth_period: inputs.growthPeriod,
+        category: inputs.category,
+        body_weight: inputs.bodyWeight,
+        gpd: inputs.gpd,
+        unavailability_percent: inputs.unavailabilityPercent,
+        price_per_arroba: inputs.pricePerArroba,
+        pasture_area: inputs.pastureArea,
+        area_unit: inputs.areaUnit,
+
+        forage_mass: outputs.forageMass,
+        support_capacity: outputs.supportCapacity,
+        stocking_rate_ua: outputs.stockingRateUA,
+        stocking_rate_ua_ha: outputs.stockingRateUAHa,
+        stocking_rate_heads: outputs.stockingRateHeads,
+        stocking_rate_heads_ha: outputs.stockingRateHeadsHa,
+        instant_stocking_rate_heads_ha: outputs.stockingRateHeadsHa * inputs.paddockCount,
+        productivity: outputs.productivity,
+        productivity_ha: outputs.productivityHa,
+
+        revenue: outputs.revenue,
+        revenue_ha: outputs.revenueHa,
+        reduction: outputs.reduction,
+        reduction_ha: outputs.reductionHa,
+        profit: outputs.profit
       }
 
       const { data, error } = await supabase
         .from('calculations')
-        .insert([newCalc])
+        .insert([flatRow])
         .select()
         .single()
 
@@ -126,7 +195,14 @@ export const localDB = {
         throw new Error('Não foi possível salvar a simulação na nuvem.')
       }
 
-      return data as Calculation
+      // Converte de volta pro formato JSON pro React não quebrar na mesma hora da tela
+      return {
+        id: data.id,
+        created_at: data.created_at,
+        inputs,
+        outputs,
+        metadata: { ranch_name: farmName }
+      } as Calculation
     } catch (e: any) {
       console.error('Erro ao salvar cálculo no Supabase:', e)
       throw new Error(e.message || 'Erro de conexão com o banco de dados.')
