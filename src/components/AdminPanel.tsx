@@ -8,13 +8,13 @@ import { useAuth } from '../context/AuthContext'
 import { generateAccessCode } from '../lib/accessCode'
 
 export const AdminPanel = () => {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const [loading, setLoading] = useState(false)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [newToken, setNewToken] = useState<string | null>(null)
 
-  const isAdminEmail = user?.email === 'valerio@gmail.com' || user?.email === 'kaian@gmail.com'
+  const isAdmin = profile?.role === 'admin'
 
   const showToast = (msg: string, type: 'success' | 'error') => {
     if (type === 'success') {
@@ -27,7 +27,7 @@ export const AdminPanel = () => {
   }
 
   const handleGenerateToken = () => {
-    if (!isAdminEmail) {
+    if (!isAdmin) {
       showToast('Apenas administradores podem gerar códigos.', 'error')
       return
     }
@@ -91,7 +91,7 @@ export const AdminPanel = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Card: Gerar Token (Apenas Super Admins) */}
-        {isAdminEmail && (
+        {isAdmin && (
           <div className="p-6 rounded-lg bg-green-50 border border-green-200 shadow-sm flex flex-col justify-between h-64 md:col-span-3 lg:col-span-1">
             <div className="space-y-3">
               <div className="flex items-center justify-between">

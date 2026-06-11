@@ -2,9 +2,6 @@
 // Permite que os administradores gerem códigos válidos que funcionam em qualquer celular sem precisar de internet ou banco de dados.
 
 export const validateAccessCode = (code: string): boolean => {
-    // Código Mestre para os administradores ou casos de emergência
-    if (code === 'AGRO-MESTRE') return true;
-
     code = code.toUpperCase();
     
     // Formato exigido: AGRO-XXXX-XXXX

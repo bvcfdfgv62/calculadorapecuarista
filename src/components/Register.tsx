@@ -22,14 +22,33 @@ export const Register = ({ setView }: RegisterProps) => {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [success, setSuccess] = useState(false)
+    const [cooldown, setCooldown] = useState(0)
+
+    React.useEffect(() => {
+        if (cooldown > 0) {
+            const timer = setTimeout(() => setCooldown(c => c - 1), 1000)
+            return () => clearTimeout(timer)
+        }
+    }, [cooldown])
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault()
+        if (cooldown > 0) {
+            setError(`Muitas tentativas. Aguarde ${cooldown} segundos.`)
+            return
+        }
         setLoading(true)
         setError(null)
 
         if (password !== confirmPassword) {
             setError('As senhas não coincidem.')
+            setLoading(false)
+            return
+        }
+
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/
+        if (!passwordRegex.test(password)) {
+            setError('A senha deve ter no mínimo 8 caracteres, contendo letras e números.')
             setLoading(false)
             return
         }
@@ -44,7 +63,12 @@ export const Register = ({ setView }: RegisterProps) => {
             const { error: regError } = await register(email, password, `${firstName} ${lastName}`, farmName || 'Fazenda Principal', phone)
             
             if (regError) {
-                setError(regError)
+                if (regError.includes('429')) {
+                    setCooldown(60)
+                    setError('Muitas requisições. Aguarde 60 segundos.')
+                } else {
+                    setError(regError)
+                }
                 setLoading(false)
                 return
             }

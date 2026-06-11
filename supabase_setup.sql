@@ -14,11 +14,16 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
 -- 3. Regras de Segurança (Policies)
-CREATE POLICY "Qualquer um pode ver perfis" 
-  ON public.profiles FOR SELECT USING (true);
+CREATE POLICY "Usuários só podem ver o próprio perfil" 
+  ON public.profiles FOR SELECT USING (auth.uid() = id);
 
 CREATE POLICY "Usuários podem inserir seu próprio perfil" 
   ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);
 
 CREATE POLICY "Usuários podem atualizar seu próprio perfil" 
   ON public.profiles FOR UPDATE USING (auth.uid() = id);
+
+-- 4. Proteção contra Elevação de Privilégio
+-- Impede que o usuário comum altere a própria permissão (role) para admin
+REVOKE UPDATE (role) ON public.profiles FROM authenticated;
+GRANT UPDATE (full_name, farm_name, phone) ON public.profiles TO authenticated;

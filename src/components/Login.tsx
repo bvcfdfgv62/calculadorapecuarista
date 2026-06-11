@@ -22,16 +22,44 @@ export const Login = ({ setView }: LoginProps) => {
     const [resetLoading, setResetLoading] = useState(false)
     const [resetSent, setResetSent] = useState(false)
     const [resetError, setResetError] = useState<string | null>(null)
+    const [loginAttempts, setLoginAttempts] = useState(0)
+    const [cooldown, setCooldown] = useState(0)
+
+    React.useEffect(() => {
+        if (cooldown > 0) {
+            const timer = setTimeout(() => setCooldown(c => c - 1), 1000)
+            return () => clearTimeout(timer)
+        }
+    }, [cooldown])
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
+        if (cooldown > 0) {
+            setError(`Muitas tentativas. Aguarde ${cooldown} segundos.`)
+            return
+        }
         setLoading(true)
         setError(null)
         
         try {
             const { error: loginError } = await login(email, password)
             if (loginError) {
-                setError(loginError)
+                if (loginError.includes('429')) {
+                    setCooldown(60)
+                    setError('Você tentou acessar muitas vezes. Aguarde 60 segundos.')
+                } else {
+                    const newAttempts = loginAttempts + 1
+                    setLoginAttempts(newAttempts)
+                    if (newAttempts >= 3) {
+                        setCooldown(30)
+                        setLoginAttempts(0)
+                        setError('Muitas tentativas falhas. Aguarde 30 segundos.')
+                    } else {
+                        setError(loginError)
+                    }
+                }
+            } else {
+                setLoginAttempts(0)
             }
         } catch {
             setError('Ocorreu um erro ao tentar entrar. Tente novamente.')
@@ -42,6 +70,10 @@ export const Login = ({ setView }: LoginProps) => {
 
     const handleForgotPassword = async (e: React.FormEvent) => {
         e.preventDefault()
+        if (cooldown > 0) {
+            setResetError(`Muitas tentativas. Aguarde ${cooldown} segundos.`)
+            return
+        }
         setResetLoading(true)
         setResetError(null)
         
@@ -59,7 +91,12 @@ export const Login = ({ setView }: LoginProps) => {
                 redirectTo: `${window.location.origin}/reset-password`,
             })
             if (error) {
-                setResetError('Erro ao enviar e-mail. Verifique se o endereço está correto.')
+                if (error.message?.includes('429')) {
+                    setCooldown(60)
+                    setResetError('Limite de requisições atingido. Aguarde 60 segundos.')
+                } else {
+                    setResetError('Erro ao enviar e-mail. Verifique se o endereço está correto.')
+                }
             } else {
                 setResetSent(true)
             }

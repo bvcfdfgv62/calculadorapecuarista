@@ -1,4 +1,3 @@
-import jsPDF from 'jspdf'
 import type { CalculatorInputs, CalculatorOutputs } from './calculator'
 
 const GREEN_PRIMARY = '#006A4E' // Corteva Green
@@ -41,7 +40,9 @@ export const generateProfessionalPDF = async (
     outputs: CalculatorOutputs,
     farmName: string
 ) => {
-    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+    const jsPDFModule = await import('jspdf')
+    const JsPDFClass = jsPDFModule.default || (jsPDFModule as any).jsPDF
+    const doc = new JsPDFClass({ orientation: 'portrait', unit: 'mm', format: 'a4' })
     const date = new Date().toLocaleDateString('pt-BR')
     const logo = await loadLogoTransparent('/logo-corteva.png')
 
